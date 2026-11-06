@@ -8,9 +8,18 @@
 - 阻塞：Phase 2 需使用者回覆計畫中的 Open Questions
 
 ## 下一步
-1. 使用者回覆 Open Questions → 展開 Phase 2 任務
+1. 使用者回覆 Open Questions（`1-Plans/2-滾動式計畫.md`）→ 展開 Phase 2 任務
+   - 最關鍵：感測器資料欄位、寫入方式（建議後端 ingest API）
+
+## 下次開工
+- 讀本檔 + `1-Plans/2-滾動式計畫.md` 即可接續；任務單在 `2-Tasks/`
+- 本機前端：`cd 9-Project/crates/frontend; trunk serve` → http://127.0.0.1:3000
+- 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-06 — 收工
+- 手動觸發一次 Cloudflare 佈署（與 `main` 一致）；停止本機 trunk serve
+- 今日完成：Phase 0 骨架、Cloudflare 佈署、Phase 1 前端雛形；待 Phase 2 Open Questions
 ### 2026-11-06 — Phase 1 驗收（T7）完成
 - 線上 https://earthquake-cm9.pages.dev：`/`、`/history`、`/demo/b`、未知路徑皆 200（Pages SPA fallback 生效）
 - 深層連結 `/demo/b` 實測：資產載入、標題、父子高亮、群組自動展開正常
