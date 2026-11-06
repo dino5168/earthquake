@@ -41,6 +41,8 @@ scripts/                   維運腳本（如文件大小檢查）
 - 文件大小檢查：`powershell -ExecutionPolicy Bypass -File scripts/check-docs-size.ps1`（於 repo 根目錄）
 
 ## 開發規則
+- 工程規則（重用、規模上限、依功能分類、命名）：`.claude/rules/engineering.md`（自動載入）
+- 前端規則：`.claude/rules/frontend.md`（只在處理 `9-Project/crates/frontend/**` 時載入）
 - Rust：`cargo fmt` + `cargo clippy -- -D warnings` 必須通過；public API 加 doc comment。
 - 錯誤處理：library 層 `thiserror`，禁止在非測試程式碼使用 `unwrap()`。
 - Secret 一律走環境變數（`.env` 不進版控）。
