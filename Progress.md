@@ -11,6 +11,10 @@
 1. 使用者回覆 Open Questions → 展開 Phase 1 任務
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-06 — 前端佈署 Cloudflare Pages（任務：2-Tasks/2-Cloudflare-佈署.md）
+- GitHub Actions `deploy-frontend.yml`：trunk build → wrangler pages deploy
+- Pages 專案 `earthquake`，網址 https://earthquake-cm9.pages.dev（`earthquake` 已被占用，自動加後綴）
+- 踩雷：誤用 Global API Key 導致 auth 10000/6111；需用 API Token（Account → Cloudflare Pages → Edit）
 ### 2026-11-06 — 安裝 trunk
 - 全域安裝 trunk 0.22.1；`trunk build --release` 成功（wasm 約 64 KB）
 
