@@ -40,7 +40,8 @@ impl LayoutState {
         if self.is_mobile.get_untracked() {
             self.mobile_open.update(|open| *open = !*open);
         } else {
-            self.set_collapsed.update(|collapsed| *collapsed = !*collapsed);
+            self.set_collapsed
+                .update(|collapsed| *collapsed = !*collapsed);
         }
     }
 

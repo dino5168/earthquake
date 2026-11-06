@@ -1,0 +1,23 @@
+.placeholder-page {
+  padding: var(--space-6) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.placeholder-page__icon {
+  display: flex;
+  font-size: 48px;
+  color: var(--brand);
+}
+
+.placeholder-page__title {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 20px;
+}
+
+.placeholder-page__message {
+  margin: 0;
+  color: var(--text-muted);
+}

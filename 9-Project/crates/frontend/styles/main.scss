@@ -1,3 +1,16 @@
 // Entry point: only @use partials here.
 @use "tokens";
 @use "base";
+
+@use "layout/app-shell";
+@use "layout/sidebar";
+@use "layout/topbar";
+
+@use "components/nav-item";
+@use "components/nav-group";
+@use "components/icon-button";
+@use "components/card";
+@use "components/stat-card";
+
+@use "pages/dashboard";
+@use "pages/placeholder-page";

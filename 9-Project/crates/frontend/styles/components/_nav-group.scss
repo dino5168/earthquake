@@ -1,0 +1,65 @@
+.nav-item__chevron {
+  display: flex;
+  margin-left: auto;
+  font-size: 14px;
+  transition: transform var(--transition);
+}
+
+.nav-group--open .nav-item__chevron {
+  transform: rotate(90deg);
+}
+
+.nav-group__children,
+.nav-group__flyout-title {
+  display: none;
+}
+
+.nav-group--open .nav-group__children {
+  display: block;
+}
+
+// Icon-only sidebar: children become a hover/focus flyout; accordion state is ignored.
+.app-shell--collapsed {
+  .nav-group {
+    position: relative;
+  }
+
+  .nav-item__chevron {
+    display: none;
+  }
+
+  .nav-group__children {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    min-width: 200px;
+    padding: var(--space-2) 0;
+    background: var(--sidebar-bg);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    box-shadow: var(--shadow-flyout);
+    z-index: var(--z-flyout);
+  }
+
+  .nav-group:hover .nav-group__children,
+  .nav-group:focus-within .nav-group__children {
+    display: block;
+  }
+
+  .nav-group__flyout-title {
+    display: block;
+    padding: var(--space-2) var(--space-4);
+    color: var(--sidebar-fg-muted);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .nav-group__children .nav-item {
+    justify-content: flex-start;
+    padding: 0 var(--space-4);
+  }
+
+  .nav-group__children .nav-item__label {
+    display: block;
+  }
+}

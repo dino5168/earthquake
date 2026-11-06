@@ -8,6 +8,14 @@ default-members = ["crates/shared", "crates/backend"]
 edition = "2021"
 version = "0.1.0"
 
+[profile.release]
+lto = true
+codegen-units = 1
+
+# Optimize the wasm bundle for size; backend keeps the default speed optimization.
+[profile.release.package.frontend]
+opt-level = "z"
+
 [workspace.dependencies]
 shared = { path = "crates/shared" }
 serde = { version = "1", features = ["derive"] }

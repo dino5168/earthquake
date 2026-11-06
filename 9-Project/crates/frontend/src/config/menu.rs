@@ -97,7 +97,10 @@ mod tests {
     #[test]
     fn menu_paths_are_unique() {
         let mut seen = HashSet::new();
-        for entry in MENU.iter().flat_map(|e| std::iter::once(e).chain(e.children)) {
+        for entry in MENU
+            .iter()
+            .flat_map(|e| std::iter::once(e).chain(e.children))
+        {
             assert!(seen.insert(entry.path), "duplicate path {}", entry.path);
         }
     }
@@ -106,7 +109,12 @@ mod tests {
     fn children_share_group_prefix() {
         for group in MENU.iter().filter(|e| !e.children.is_empty()) {
             for child in group.children {
-                assert!(is_active(group.path, child.path), "{} outside {}", child.path, group.path);
+                assert!(
+                    is_active(group.path, child.path),
+                    "{} outside {}",
+                    child.path,
+                    group.path
+                );
             }
         }
     }

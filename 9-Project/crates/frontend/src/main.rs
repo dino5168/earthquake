@@ -1,17 +1,11 @@
-use leptos::prelude::*;
+mod app;
+mod components;
+mod config;
+mod layout;
+mod pages;
+mod state;
 
 fn main() {
     console_error_panic_hook::set_once();
-    leptos::mount::mount_to_body(App);
-}
-
-/// Root component.
-#[component]
-fn App() -> impl IntoView {
-    view! {
-        <main>
-            <h1>"十方地震監測網"</h1>
-            <p>"Earthquake monitoring network — skeleton"</p>
-        </main>
-    }
+    leptos::mount::mount_to_body(app::App);
 }

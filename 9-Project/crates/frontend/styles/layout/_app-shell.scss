@@ -1,0 +1,41 @@
+@use "../tokens" as *;
+
+.app-shell__main {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left var(--transition);
+}
+
+.app-shell--collapsed .app-shell__main {
+  margin-left: var(--sidebar-w-collapsed);
+}
+
+.app-shell__content {
+  flex: 1;
+  padding: var(--space-5);
+}
+
+.app-shell__overlay {
+  display: none;
+}
+
+@media (max-width: $mobile-max) {
+  .app-shell__main,
+  .app-shell--collapsed .app-shell__main {
+    margin-left: 0;
+  }
+
+  .app-shell__content {
+    padding: var(--space-4);
+  }
+
+  .app-shell--drawer-open .app-shell__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: var(--z-overlay);
+  }
+}
