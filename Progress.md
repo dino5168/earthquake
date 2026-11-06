@@ -17,6 +17,9 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-06 — 即時推播可行性評估（任務：3-可行性分析/1-可行性分析.md）
+- 結論可行：PG `LISTEN/NOTIFY`（trigger）→ tokio broadcast → axum SSE → Tunnel → `EventSource`；不需新依賴
+- 評估計畫與 PoC P1–P6：`3-可行性分析/2-即時推播評估計畫.md`；建議與 Phase 4 一起做
 ### 2026-11-06 — Obsidian 顯示 .claude
 - Obsidian 不顯示 dot 資料夾 → 建 junction `claude/` → `.claude/`（已 gitignore，新 clone 需重建：`New-Item -ItemType Junction -Path claude -Target .claude`）
 ### 2026-11-06 — 收工
