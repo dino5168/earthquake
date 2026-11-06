@@ -37,6 +37,7 @@ scripts/                   維運腳本（如文件大小檢查）
 - 後端啟動：`cargo run -p backend`（需 `.env`，參考 `.env.example`）
 - 前端開發：`cd crates/frontend; trunk serve`
 - 前端建置：`cd crates/frontend; trunk build --release`（輸出 `dist/`）
+- 前端佈署：push `main`（frontend/shared 有變更）→ GitHub Actions `.github/workflows/deploy-frontend.yml` → Cloudflare Pages 專案 `earthquake`（https://earthquake.pages.dev）。secrets：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`
 - 文件大小檢查：`powershell -ExecutionPolicy Bypass -File scripts/check-docs-size.ps1`（於 repo 根目錄）
 
 ## 開發規則

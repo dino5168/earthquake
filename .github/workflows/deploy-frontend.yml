@@ -1,0 +1,66 @@
+name: Deploy frontend (Cloudflare Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "9-Project/crates/frontend/**"
+      - "9-Project/crates/shared/**"
+      - "9-Project/Cargo.lock"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
+
+# A newer push supersedes an in-flight deploy; never run two uploads concurrently.
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TRUNK_VERSION: v0.22.1
+  PAGES_PROJECT: earthquake
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 9-Project/crates/frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "9-Project -> target"
+
+      # Prebuilt binary: `cargo install trunk` would add ~6 minutes per uncached run.
+      - name: Install trunk
+        run: |
+          curl -sSL "https://github.com/trunk-rs/trunk/releases/download/${TRUNK_VERSION}/trunk-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C "$HOME/.cargo/bin"
+          trunk --version
+
+      - name: Build
+        run: trunk build --release
+
+      # Direct-upload projects must exist before `pages deploy`; this fails harmlessly once created.
+      - name: Ensure Pages project exists
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create ${{ env.PAGES_PROJECT }} --production-branch=main
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy 9-Project/crates/frontend/dist --project-name=${{ env.PAGES_PROJECT }} --branch=main
