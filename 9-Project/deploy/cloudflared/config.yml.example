@@ -1,0 +1,12 @@
+# Cloudflare Tunnel on the internal backend host (no inbound firewall port needed).
+# Setup: cloudflared tunnel login
+#        cloudflared tunnel create earthquake-api
+#        cloudflared tunnel route dns earthquake-api api.<your-domain>
+# The credentials JSON is a secret: keep it outside the repo.
+tunnel: <TUNNEL_ID>
+credentials-file: C:\ProgramData\cloudflared\<TUNNEL_ID>.json
+
+ingress:
+  - hostname: api.<your-domain>
+    service: http://127.0.0.1:8080
+  - service: http_status:404

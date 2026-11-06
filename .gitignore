@@ -1,0 +1,18 @@
+# Rust
+target/
+**/dist/
+
+# Secrets
+.env
+*.env.local
+deploy/cloudflared/*.json
+
+# Obsidian (per-user UI state)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

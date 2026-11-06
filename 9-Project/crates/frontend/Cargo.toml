@@ -1,0 +1,9 @@
+[package]
+name = "frontend"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+shared.workspace = true
+leptos = { version = "0.8", features = ["csr"] }
+console_error_panic_hook = "0.1"
