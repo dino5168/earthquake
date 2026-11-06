@@ -1,0 +1,51 @@
+// Design tokens. Components must use these variables instead of literal values.
+
+// CSS custom properties cannot be used inside media queries, so breakpoints stay Sass variables.
+$mobile-max: 767px;
+
+:root {
+  // Sidebar
+  --sidebar-bg: #0f1b2d;
+  --sidebar-bg-hover: #16243a;
+  --sidebar-fg: #c5cbd6;
+  --sidebar-fg-strong: #ffffff;
+  --sidebar-fg-muted: #8a94a6;
+  --sidebar-w: 260px;
+  --sidebar-w-collapsed: 64px;
+
+  // Brand & accents
+  --brand: #f5a623;
+  --accent: #4f7cff;
+  --accent-contrast: #ffffff;
+  --accent-soft: #e8eeff;
+  --badge: #ff4d6d;
+
+  // Content
+  --content-bg: #f3f4f7;
+  --surface: #ffffff;
+  --border: #e6e8ee;
+  --text: #1f2633;
+  --text-muted: #6b7385;
+  --overlay: rgba(15, 27, 45, 0.5);
+
+  // Shape & spacing
+  --topbar-h: 64px;
+  --radius: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-flyout: 4px 4px 16px rgba(0, 0, 0, 0.25);
+  --transition: 200ms ease;
+
+  // Stacking
+  --z-topbar: 10;
+  --z-overlay: 20;
+  --z-sidebar: 30;
+  --z-flyout: 40;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
