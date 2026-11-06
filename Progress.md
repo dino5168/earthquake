@@ -17,6 +17,8 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-06 — Obsidian 顯示 .claude
+- Obsidian 不顯示 dot 資料夾 → 建 junction `claude/` → `.claude/`（已 gitignore，新 clone 需重建：`New-Item -ItemType Junction -Path claude -Target .claude`）
 ### 2026-11-06 — 收工
 - 手動觸發一次 Cloudflare 佈署（與 `main` 一致）；停止本機 trunk serve
 - 今日完成：Phase 0 骨架、Cloudflare 佈署、Phase 1 前端雛形；待 Phase 2 Open Questions

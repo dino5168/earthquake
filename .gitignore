@@ -16,3 +16,6 @@ Thumbs.db
 .DS_Store
 .vscode/
 .idea/
+
+# Obsidian 看不到 dot 資料夾：claude/ 是指向 .claude/ 的 junction，只在本機使用
+/claude
