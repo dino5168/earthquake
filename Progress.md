@@ -4,17 +4,25 @@
 > 計畫細節見 [1-Plans/2-滾動式計畫.md](1-Plans/2-滾動式計畫.md)。
 
 ## 目前狀態
-- 階段：Phase 2 — 資料模型與寫入（Phase 1 已完成並歸檔）
-- 阻塞：Phase 2 需使用者回覆計畫中的 Open Questions
+- 主線：Phase 2 — 資料模型與寫入（Phase 1 已完成並歸檔），**阻塞**中，等使用者回覆 Open Questions
+- 支線（11-10 完成）：CWA 地震目錄 1990–2025 → CSV → 3D 點雲，已上線 https://earthquake-cm9.pages.dev/history
+- 測試（11-10）：圖片轉 3D 點雲（大衛像）只在本機測試，不上線
 
 ## 下一步
 1. 使用者回覆 Open Questions（`1-Plans/2-滾動式計畫.md`）→ 展開 Phase 2 任務
    - 最關鍵：感測器資料欄位、寫入方式（建議後端 ingest API）
+2. 待確認的小事項：
+   - `review_status` F/N/X 的意義（向 CWA 查證）
+   - 大衛像照片的授權（若要上線才需要）
+   - Blender addon 更新與 3D 生成服務設定（若要做圖片點雲的方案 B 才需要）
+3. 滾動式計畫尚未納入 11-10 的支線成果；下次規劃時把 `/history` 3D 和 Phase 3/4 的關係補進去
 
 ## 下次開工
-- 讀本檔 + `1-Plans/2-滾動式計畫.md` 即可接續；任務單在 `2-Tasks/`
-- 本機前端：`cd 9-Project/crates/frontend; trunk serve` → http://127.0.0.1:3000
-- 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
+- 讀本檔 + `1-Plans/2-滾動式計畫.md` 即可接續；任務單在 `2-Tasks/`、`1-Plans/`、`4-資料處理/`、`5-3D點雲/`
+- 本機前端：先 `cd 9-Project/viz/eq-3d; pnpm build`，再 `cd ../../crates/frontend; trunk serve` → http://127.0.0.1:3000（見 `9-Project/docs/eq-3d.md`）
+- 3D 檢視器單獨開發：`cd 9-Project/viz/eq-3d; pnpm dev` → http://localhost:5173/viz/eq-3d/
+- 圖片點雲：`cd 5-3D點雲; uv run --no-project --with numpy --with pillow --with torch --with transformers image_to_cloud.py <圖片>`
+- 線上：https://earthquake-cm9.pages.dev（push 前端或 `viz/` 的變更會自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
 ### 2026-11-10 — 圖片轉 3D 點雲測試（任務：5-3D點雲/1-圖片點雲測試.md）
