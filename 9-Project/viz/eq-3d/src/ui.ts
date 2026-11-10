@@ -14,6 +14,8 @@ export interface Layers {
   image: { object: THREE.Points; uniforms: ImageCloudUniforms } | null;
   /** Event counts per depth class, `DEPTH_CLASSES` order. */
   classCounts: readonly number[];
+  /** Called when the magnitude-class size mode is toggled, e.g. to update the legend. */
+  onMagClassMode: (on: boolean) => void;
 }
 
 /**
@@ -22,7 +24,7 @@ export interface Layers {
  * @param layers Scene layers to control.
  */
 export function createControls(layers: Layers): void {
-  const { points, terrain, frame, axes, uniforms, image, classCounts } = layers;
+  const { points, terrain, frame, axes, uniforms, image, classCounts, onMagClassMode } = layers;
   const terrainMat = terrain.material as THREE.MeshLambertMaterial;
   terrain.geometry.computeBoundingBox();
   const seafloorKm = terrain.geometry.boundingBox?.min.y ?? 0;
@@ -33,6 +35,7 @@ export function createControls(layers: Layers): void {
     terrainOpacity: terrainMat.opacity,
     showTerrain: true,
     showAxes: true,
+    magClassMode: false,
   };
   const applyScale = (): void => {
     points.scale.y = params.depthScale;
@@ -58,6 +61,10 @@ export function createControls(layers: Layers): void {
   pts.add(uniforms.uSize, "value", 0.5, 8, 0.1).name("點大小");
   pts.add(uniforms.uOpacity, "value", 0.1, 1, 0.05).name("亮度");
   pts.add(uniforms.uMinMag, "value", 3, 7, 0.1).name("最小規模 ML");
+  pts.add(params, "magClassMode").name("依規模分級").onChange((v: boolean) => {
+    uniforms.uMagClassMode.value = v ? 1 : 0;
+    onMagClassMode(v);
+  });
   // Slider bounds come from the data so a new catalog year needs no code change
   const [y0, y1] = [uniforms.uYearMin.value, uniforms.uYearMax.value];
   const yearMin = pts.add(uniforms.uYearMin, "value", y0, y1, 1).name("起始年");
@@ -109,25 +116,4 @@ function addClassFolder(gui: GUI, uniforms: PointUniforms, counts: readonly numb
         uniforms.uClassMask.value[i] = v ? 1 : 0;
       });
   });
-}
-
-/**
- * Render the depth class legend into `el`.
- *
- * @param el Container element.
- * @param counts Event counts per class, `DEPTH_CLASSES` order.
- */
-export function renderLegend(el: HTMLElement, counts: readonly number[]): void {
-  const rows = DEPTH_CLASSES.map(
-    (c, i) => `
-    <li class="legend__item">
-      <span class="legend__swatch" style="background:${c.color}"></span>
-      <span class="legend__name">${c.nameZh}<small>${c.nameEn}</small></span>
-      <span class="legend__range">${c.min}–${c.max} km · ${(counts[i] ?? 0).toLocaleString()}</span>
-    </li>`,
-  ).join("");
-  el.innerHTML = `
-    <div class="legend__title">震源深度分類</div>
-    <ul class="legend__list">${rows}</ul>
-    <div class="legend__note">點大小 ∝ 規模 ML｜分類依中央氣象署</div>`;
 }

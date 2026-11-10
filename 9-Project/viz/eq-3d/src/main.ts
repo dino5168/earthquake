@@ -2,13 +2,16 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 import { parseCatalog, parseImageCloud } from "./catalog";
-import { countByClass } from "./depthClass";
+import { DEPTH_CLASSES } from "./depthClass";
+import { renderLegend } from "./legend";
+import { MAGNITUDE_CLASSES } from "./magnitudeClass";
+import { countByClass } from "./rangeClass";
 import { createAxes } from "./layers/axes";
 import { createFrame } from "./layers/frame";
 import { createImageCloud } from "./layers/imageCloud";
 import { createPoints } from "./layers/points";
 import { createTerrain, parseTerrainMeta } from "./layers/terrain";
-import { createControls, renderLegend } from "./ui";
+import { createControls } from "./ui";
 import "./style.css";
 
 const DATA = `${import.meta.env.BASE_URL}data/`;
@@ -97,9 +100,10 @@ async function start(): Promise<void> {
   const image = await loadImageCloud();
   if (image) scene.add(image.object);
 
-  const classCounts = countByClass(parsed.data.depth);
-  createControls({ points, terrain, frame, axes, uniforms, image, classCounts });
-  renderLegend(document.getElementById("legend")!, classCounts);
+  const classCounts = countByClass(parsed.data.depth, DEPTH_CLASSES);
+  const magCounts = countByClass(parsed.data.magnitude, MAGNITUDE_CLASSES);
+  const onMagClassMode = renderLegend(document.getElementById("legend")!, classCounts, magCounts);
+  createControls({ points, terrain, frame, axes, uniforms, image, classCounts, onMagClassMode });
   status.textContent =
     `${parsed.data.count.toLocaleString()} 筆地震` +
     `（${uniforms.uYearMin.value}–${uniforms.uYearMax.value}, ML ≥ 3）`;

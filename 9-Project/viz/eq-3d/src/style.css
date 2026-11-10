@@ -79,18 +79,26 @@ body {
 
 .legend__item {
   display: grid;
-  grid-template-columns: 14px auto;
+  grid-template-columns: 24px auto;
   column-gap: 8px;
   margin-bottom: 6px;
 }
 
-.legend__swatch {
+.legend__marker {
   grid-row: span 2;
-  width: 14px;
-  height: 14px;
-  margin-top: 3px;
-  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.legend__marker span {
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25);
+}
+
+.legend__section {
+  margin-top: 4px;
 }
 
 .legend__name small {

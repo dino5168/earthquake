@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import type { Catalog } from "../catalog";
 import { hexToRgb } from "../colormap";
-import { DEPTH_CLASSES, depthClassOf } from "../depthClass";
+import { DEPTH_CLASSES } from "../depthClass";
+import { MAGNITUDE_CLASSES } from "../magnitudeClass";
+import { classOf } from "../rangeClass";
 import { toSceneXZ } from "../geo";
 
 /** Runtime-tunable uniforms of the point layer. */
@@ -13,6 +15,10 @@ export interface PointUniforms {
   uYearMax: { value: number };
   /** Per depth class: 1 = shown, 0 = hidden (`DEPTH_CLASSES` order). */
   uClassMask: { value: number[] };
+  /** 0 = size grows continuously with ML, 1 = fixed size per magnitude class. */
+  uMagClassMode: { value: number };
+  /** Size multiplier per magnitude class (`MAGNITUDE_CLASSES` order). */
+  uMagClassSize: { value: number[] };
   uPixelRatio: { value: number };
 }
 
@@ -21,11 +27,14 @@ const vertexShader = /* glsl */ `
   attribute float aMag;
   attribute float aYear;
   attribute float aClass;
+  attribute float aMagClass;
   uniform float uSize;
   uniform float uMinMag;
   uniform float uYearMin;
   uniform float uYearMax;
   uniform float uClassMask[${DEPTH_CLASSES.length}];
+  uniform float uMagClassMode;
+  uniform float uMagClassSize[${MAGNITUDE_CLASSES.length}];
   uniform float uPixelRatio;
   varying vec3 vColor;
 
@@ -36,7 +45,10 @@ const vertexShader = /* glsl */ `
       || uClassMask[int(aClass + 0.5)] < 0.5;
     // Energy grows ~31.6x per magnitude unit; 1.6x per unit keeps big events
     // prominent without hiding small ones.
-    float size = uSize * pow(1.6, aMag - 3.0) * uPixelRatio * (600.0 / -mv.z);
+    float scale = uMagClassMode > 0.5
+      ? uMagClassSize[int(aMagClass + 0.5)]
+      : pow(1.6, aMag - 3.0);
+    float size = uSize * scale * uPixelRatio * (600.0 / -mv.z);
     gl_PointSize = hidden ? 0.0 : size;
     vColor = color;
   }
@@ -69,11 +81,13 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
   const pos = new Float32Array(cat.count * 3);
   const col = new Float32Array(cat.count * 3);
   const cls = new Float32Array(cat.count);
+  const magCls = new Float32Array(cat.count);
   const palette = DEPTH_CLASSES.map((c) => hexToRgb(c.pointColor));
   for (let i = 0; i < cat.count; i++) {
     const [x, z] = toSceneXZ(cat.lon[i]!, cat.lat[i]!);
     pos.set([x, -cat.depth[i]!, z], i * 3);
-    cls[i] = depthClassOf(cat.depth[i]!);
+    cls[i] = classOf(cat.depth[i]!, DEPTH_CLASSES);
+    magCls[i] = classOf(cat.magnitude[i]!, MAGNITUDE_CLASSES);
     col.set(palette[cls[i]!]!, i * 3);
   }
   const geom = new THREE.BufferGeometry();
@@ -81,6 +95,7 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
   geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
   geom.setAttribute("aMag", new THREE.BufferAttribute(cat.magnitude, 1));
   geom.setAttribute("aClass", new THREE.BufferAttribute(cls, 1));
+  geom.setAttribute("aMagClass", new THREE.BufferAttribute(magCls, 1));
   geom.setAttribute("aYear", new THREE.BufferAttribute(new Float32Array(cat.year), 1));
 
   const uniforms: PointUniforms = {
@@ -91,6 +106,8 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
     uYearMin: { value: cat.year.reduce((a, b) => Math.min(a, b)) },
     uYearMax: { value: cat.year.reduce((a, b) => Math.max(a, b)) },
     uClassMask: { value: DEPTH_CLASSES.map(() => 1) },
+    uMagClassMode: { value: 0 },
+    uMagClassSize: { value: MAGNITUDE_CLASSES.map((c) => c.sizeScale) },
     uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
   };
   const material = new THREE.ShaderMaterial({
