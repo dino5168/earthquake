@@ -23,3 +23,8 @@ Thumbs.db
 # Python
 __pycache__/
 .pytest_cache/
+
+# 原始資料與轉檔輸出（CWA 地震目錄，可由 XML 重建 CSV）
+/4-資料處理/*.xml
+/4-資料處理/*.csv
+/4-資料處理/CSV/
