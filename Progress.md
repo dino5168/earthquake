@@ -17,6 +17,10 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-10 — 點雲整合進網站 /history 實作計畫（任務：1-Plans/5-將地震點雲放到正是網站.md）
+- 計畫書 `1-Plans/5-地震點雲整合網站實作計畫.md`：評估可行，T1–T6
+- 決策：iframe 嵌入 `/viz/eq-3d/`、3D 填滿整頁、資料（約 4.7 MB）進 git；eq-3d 搬到 `9-Project/viz/eq-3d`；CI 加入 Node／pnpm
+- 待開工 T1
 ### 2026-11-10 — 地震點雲 3D 原型 T1–T6 完成（`4-資料處理/eq-3d/`）
 - `build_terrain.py`：AWS Terrarium z7 → 601×701 Int16 網格（EPSG:3857 → 4326 重採樣）；玉山 3616 m、花蓮外海 −3707 m
 - Vite 8 + TS 7 strict + three 0.187 + lil-gui；vitest 9 tests、pytest 18 tests、`pnpm build` 通過，console 無錯誤
@@ -50,9 +54,3 @@
 - 線上 https://earthquake-cm9.pages.dev：`/`、`/history`、`/demo/b`、未知路徑皆 200（Pages SPA fallback 生效）
 - 深層連結 `/demo/b` 實測：資產載入、標題、父子高亮、群組自動展開正常
 - 實作計畫歸檔至 `1-Plans/archive/plan-phase-1-前端雛形實作計畫.md`
-### 2026-11-06 — 前端雛形實作 T1–T6
-- AppShell/Sidebar/Topbar、NavItem/NavGroup（accordion + collapsed flyout）、Card/StatCard、Dashboard、PlaceholderPage
-- 路由：`/` → Dashboard；其餘走 `Routes fallback=MenuRoutePage`（依 MENU 查標題，未知路徑顯示「找不到頁面」）
-- leptos-use 0.20 已拆 micro crate，改直接依賴 `leptos-use-storage` / `leptos-use-media-query`
-- 瀏覽器實測（含 400px iframe 模擬手機）：收合記憶、flyout、父子高亮、抽屜/遮罩/換頁關閉、404 皆正常，console 無錯誤
-- wasm：加 router 後 517 KB → release profile（lto + opt-level z）降至 364 KB（gzip 138 KB）
