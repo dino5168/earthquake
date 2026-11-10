@@ -17,6 +17,10 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-10 — CWA 地震目錄 XML → CSV（任務：1-Plans/3-地震資料處理.md）
+- `4-資料處理/cwa_catalog_to_csv.py`（stdlib only）+ pytest 5 tests；1990 輸出 `CSV/CWA-EQ-Catalog-1990.csv`（2451 筆，與 RecordNumber 一致）
+- 欄位 snake_case、單位寫入欄名；選填欄位（erz/rms/erh/最小震央距）缺漏輸出空字串；時間保留原始 `+08:00`
+- 原始 XML（1990–2025，約 50 MB）未進版控，待決定
 ### 2026-11-06 — IoT（MQTT）架構比較（任務：3-可行性分析/3-系統架構評估.md）
 - 結論：現階段採 DB 推播（SSE）；MQTT 只在高頻/大量裝置/下行控制時引入，且 broker 留內網、前端仍走 SSE
 - 文件：`3-可行性分析/4-IoT架構比較.md`
@@ -49,11 +53,3 @@
 - 踩雷：誤用 Global API Key 導致 auth 10000/6111；需用 API Token（Account → Cloudflare Pages → Edit）
 ### 2026-11-06 — 安裝 trunk
 - 全域安裝 trunk 0.22.1；`trunk build --release` 成功（wasm 約 64 KB）
-
-### 2026-11-06 — 專案初始化（任務：2-Tasks/1-開始.md）
-- 建立 CLAUDE.md、Progress.md、1-Plans/2-滾動式計畫.md 與文件分層/歸檔規則
-- 建立 `9-Project` Cargo workspace（shared / backend / frontend）與 Cloudflare Tunnel 範本
-- 新增 `scripts/check-docs-size.ps1` 檢查文件行數上限
-- 驗證：`cargo test`（5 tests pass）、`clippy -D warnings`、`fmt`、frontend `cargo check --target wasm32-unknown-unknown` 皆通過
-- 環境：新增 wasm32 target，rustup stable 更新 1.93 → 1.95（wasm std 版本需一致）
-- git init，push 至 https://github.com/dino5168/earthquake
