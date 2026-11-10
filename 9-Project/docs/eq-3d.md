@@ -10,6 +10,7 @@
 - 規模分類放在 `src/magnitudeClass.ts`，依 CWA 地震百問 33 分為四類：M < 3／3–5／5–7／≥ 7。勾選「依規模著色與分級」後，點顏色改為 CWA 規模色帶的連續漸層（`MAGNITUDE_COLOR_STOPS`：M 1／3／5／7 = 綠／藍／橘／紅），點大小改為 4 級固定倍率（`sizeScale`）；深度改由位置和分層線表達。兩組顏色（`color`／`aMagColor`）都放在 GPU，切換時只改 uniform。
 - 兩種分類共用 `src/rangeClass.ts` 的 `classOf`／`countByClass`；圖例在 `src/legend.ts`。
 - 座標軸放在 `src/layers/axes.ts`：經度標在外框南緣，緯度標在東緣，深度標在西南角的垂直邊。標籤用 three 內建的 `CSS2DRenderer`，會跟著深度倍率移動。
+- 格線放在 `src/layers/grid.ts`：海平面（Z=0）有 1° 經緯線，北牆和東牆有經緯度垂直線和深度水平線，由「經緯度與深度格線」切換。格線比地形（`renderOrder` 2）先繪製，所以被地形蓋住時仍會隱約透出。
 
 ## 本機開發
 ```powershell

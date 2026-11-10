@@ -8,6 +8,7 @@ import { MAGNITUDE_CLASSES } from "./magnitudeClass";
 import { countByClass } from "./rangeClass";
 import { createAxes } from "./layers/axes";
 import { createFrame } from "./layers/frame";
+import { createGrid } from "./layers/grid";
 import { createPoints } from "./layers/points";
 import { createTerrain, parseTerrainMeta } from "./layers/terrain";
 import { createControls } from "./ui";
@@ -74,12 +75,13 @@ async function start(): Promise<void> {
   const terrain = createTerrain(parseTerrainMeta(meta), new Int16Array(bin));
   const frame = createFrame(FRAME_DEPTH_KM);
   const axes = createAxes(FRAME_DEPTH_KM);
-  scene.add(points, terrain, frame, axes);
+  const grid = createGrid(FRAME_DEPTH_KM);
+  scene.add(points, terrain, frame, axes, grid);
 
   const classCounts = countByClass(parsed.data.depth, DEPTH_CLASSES);
   const magCounts = countByClass(parsed.data.magnitude, MAGNITUDE_CLASSES);
   const onMagClassMode = renderLegend(document.getElementById("legend")!, classCounts, magCounts);
-  createControls({ points, terrain, frame, axes, uniforms, classCounts, onMagClassMode });
+  createControls({ points, terrain, frame, axes, grid, uniforms, classCounts, onMagClassMode });
   status.textContent =
     `${parsed.data.count.toLocaleString()} 筆地震` +
     `（${uniforms.uYearMin.value}–${uniforms.uYearMax.value}, ML ≥ 3）`;

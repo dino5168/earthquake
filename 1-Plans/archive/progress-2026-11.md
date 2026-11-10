@@ -1,5 +1,16 @@
 # Progress 歸檔 — 2026-11
 
+### 2026-11-06 — IoT（MQTT）架構比較（任務：3-可行性分析/3-系統架構評估.md）
+- 結論：現階段採 DB 推播（SSE）；MQTT 只在高頻/大量裝置/下行控制時引入，且 broker 留內網、前端仍走 SSE
+- 文件：`3-可行性分析/4-IoT架構比較.md`
+### 2026-11-06 — 即時推播可行性評估（任務：3-可行性分析/1-可行性分析.md）
+- 結論可行：PG `LISTEN/NOTIFY`（trigger）→ tokio broadcast → axum SSE → Tunnel → `EventSource`；不需新依賴
+- 評估計畫與 PoC P1–P6：`3-可行性分析/2-即時推播評估計畫.md`；建議與 Phase 4 一起做
+### 2026-11-06 — Obsidian 顯示 .claude
+- Obsidian 不顯示 dot 資料夾 → 建 junction `claude/` → `.claude/`（已 gitignore，新 clone 需重建：`New-Item -ItemType Junction -Path claude -Target .claude`）
+### 2026-11-06 — 收工
+- 手動觸發一次 Cloudflare 佈署（與 `main` 一致）；停止本機 trunk serve
+- 今日完成：Phase 0 骨架、Cloudflare 佈署、Phase 1 前端雛形；待 Phase 2 Open Questions
 ### 2026-11-06 — Phase 1 驗收（T7）完成
 - 線上 https://earthquake-cm9.pages.dev：`/`、`/history`、`/demo/b`、未知路徑皆 200（Pages SPA fallback 生效）
 - 深層連結 `/demo/b` 實測：資產載入、標題、父子高亮、群組自動展開正常

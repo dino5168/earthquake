@@ -6,7 +6,7 @@ import { EXTENT, toSceneXZ } from "../geo";
 const TICK_KM = 12;
 const LABEL_KM = 34;
 const TITLE_KM = 75;
-const DEPTH_TICKS_KM = [0, 30, 70, 100, 200, 300] as const;
+export const DEPTH_TICKS_KM = [0, 30, 70, 100, 200, 300] as const;
 
 /**
  * Evenly spaced tick values from `min` to `max` inclusive.
@@ -44,9 +44,9 @@ function makeLabel(text: string, pos: THREE.Vector3, variant?: string): CSS2DObj
  * @param pts Consecutive pairs form one segment each.
  * @param color Line colour.
  * @param opacity Line opacity.
- * @returns Line segments object.
+ * @returns Line segments object (renderOrder 3, drawn after terrain).
  */
-function makeSegments(pts: number[][], color: THREE.ColorRepresentation, opacity: number): THREE.LineSegments {
+export function makeSegments(pts: number[][], color: THREE.ColorRepresentation, opacity: number): THREE.LineSegments {
   const geom = new THREE.BufferGeometry();
   geom.setAttribute("position", new THREE.Float32BufferAttribute(pts.flat(), 3));
   const lines = new THREE.LineSegments(geom, new THREE.LineBasicMaterial({ color, transparent: true, opacity }));

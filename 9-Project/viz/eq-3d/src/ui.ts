@@ -8,6 +8,8 @@ export interface Layers {
   terrain: THREE.Mesh;
   frame: THREE.LineSegments;
   axes: THREE.Group;
+  /** Lon/lat grid at Z = 0 plus depth grid on the back walls. */
+  grid: THREE.LineSegments;
   uniforms: PointUniforms;
   /** Event counts per depth class, `DEPTH_CLASSES` order. */
   classCounts: readonly number[];
@@ -21,7 +23,7 @@ export interface Layers {
  * @param layers Scene layers to control.
  */
 export function createControls(layers: Layers): void {
-  const { points, terrain, frame, axes, uniforms, classCounts, onMagClassMode } = layers;
+  const { points, terrain, frame, axes, grid, uniforms, classCounts, onMagClassMode } = layers;
   const terrainMat = terrain.material as THREE.MeshLambertMaterial;
   terrain.geometry.computeBoundingBox();
   const seafloorKm = terrain.geometry.boundingBox?.min.y ?? 0;
@@ -32,12 +34,14 @@ export function createControls(layers: Layers): void {
     terrainOpacity: terrainMat.opacity,
     showTerrain: true,
     showAxes: true,
+    showGrid: true,
     magClassMode: false,
   };
   const applyScale = (): void => {
     points.scale.y = params.depthScale;
     frame.scale.y = params.depthScale;
     axes.scale.y = params.depthScale;
+    grid.scale.y = params.depthScale;
     terrain.scale.y = params.terrainScale;
     // Exaggerated bathymetry (−6.4 km × 10) would swallow the shallow red
     // layer; lifting puts the deepest seafloor at y=0 like the reference image.
@@ -77,6 +81,9 @@ export function createControls(layers: Layers): void {
 
   gui.add(params, "showAxes").name("座標軸與分層線").onChange((v: boolean) => {
     axes.visible = v;
+  });
+  gui.add(params, "showGrid").name("經緯度與深度格線").onChange((v: boolean) => {
+    grid.visible = v;
   });
 
   const ter = gui.addFolder("地形");

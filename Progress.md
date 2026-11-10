@@ -6,7 +6,7 @@
 ## 目前狀態
 - 主線：Phase 2 — 資料模型與寫入（Phase 1 已完成並歸檔），**阻塞**中，等使用者回覆 Open Questions
 - 支線（11-10 完成）：CWA 地震目錄 1990–2025 → CSV → 3D 點雲，已上線 https://earthquake-cm9.pages.dev/history
-- 支線（11-10 完成）：點雲改用 CWA 震源深度四分類配色，並加上經緯度與深度座標軸；可切換成依規模漸層著色、大小分級（CWA 色帶）
+- 支線（11-10 完成）：點雲改用 CWA 震源深度四分類配色，並加上經緯度與深度座標軸；可切換成依規模漸層著色、大小分級（CWA 色帶）；可顯示經緯度與深度格線
 
 ## 下一步
 1. 使用者回覆 Open Questions（`1-Plans/2-滾動式計畫.md`）→ 展開 Phase 2 任務
@@ -22,6 +22,11 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端或 `viz/` 的變更會自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-10 — 地震點雲：經緯度與深度格線（任務：1-Plans/10-經緯度格線.md）
+- 新增 `layers/grid.ts`：在海平面（Z=0）畫 1° 經緯線格線；在北牆和東牆畫經緯度垂直線，以及深度 30／70／100／200／300 km 水平線，會跟著深度倍率縮放
+- 控制面板新增「經緯度與深度格線」checkbox，預設顯示（使用者決定）；格線放北牆＋東牆、間距 1°（使用者決定）
+- 格線比半透明地形先繪製，並關閉 depthWrite，所以在「地形浮於點雲上」時仍隱約可見，也不會遮住點雲
+- vitest 39 tests、tsc 與 build 都通過；本機瀏覽器驗收格線位置正確
 ### 2026-11-10 — 地震點雲：規模色帶著色，並移除圖片點雲測試（任務：1-Plans/9-顏色分類.md）
 - 參考設計是 CWA 地震百問 33 的規模色帶（`1-Plans/images/地震規模色帶.png`）
 - 勾選「依規模著色與分級」後，點顏色依規模連續漸層（M 1／3／5／7 = 綠／藍／橘／紅，使用者選連續漸層），大小維持 4 級；深度改由位置和分層線表達，深度圖例改標「篩選」並淡化色塊
@@ -71,14 +76,3 @@
 - 1990–2025 全部轉檔完成（共 73,729 筆）；時間保留 `+08:00`（使用者決定）
 - 原始 XML 與 CSV 輸出加入 `.gitignore`（CSV 可由 XML 重建）
 - 欄位說明書 `4-資料處理/EarthquakeHistory.html`；`review_status` F/N/X 意義待向 CWA 查證
-### 2026-11-06 — IoT（MQTT）架構比較（任務：3-可行性分析/3-系統架構評估.md）
-- 結論：現階段採 DB 推播（SSE）；MQTT 只在高頻/大量裝置/下行控制時引入，且 broker 留內網、前端仍走 SSE
-- 文件：`3-可行性分析/4-IoT架構比較.md`
-### 2026-11-06 — 即時推播可行性評估（任務：3-可行性分析/1-可行性分析.md）
-- 結論可行：PG `LISTEN/NOTIFY`（trigger）→ tokio broadcast → axum SSE → Tunnel → `EventSource`；不需新依賴
-- 評估計畫與 PoC P1–P6：`3-可行性分析/2-即時推播評估計畫.md`；建議與 Phase 4 一起做
-### 2026-11-06 — Obsidian 顯示 .claude
-- Obsidian 不顯示 dot 資料夾 → 建 junction `claude/` → `.claude/`（已 gitignore，新 clone 需重建：`New-Item -ItemType Junction -Path claude -Target .claude`）
-### 2026-11-06 — 收工
-- 手動觸發一次 Cloudflare 佈署（與 `main` 一致）；停止本機 trunk serve
-- 今日完成：Phase 0 骨架、Cloudflare 佈署、Phase 1 前端雛形；待 Phase 2 Open Questions
