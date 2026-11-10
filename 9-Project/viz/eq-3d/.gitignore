@@ -1,2 +1,4 @@
 node_modules/
 dist/
+# local-only test layer (5-3D點雲/image_to_cloud.py); never deployed
+public/data/image-cloud.csv

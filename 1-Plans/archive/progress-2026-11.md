@@ -1,5 +1,10 @@
 # Progress 歸檔 — 2026-11
 
+### 2026-11-06 — Phase 1 驗收（T7）完成
+- 線上 https://earthquake-cm9.pages.dev：`/`、`/history`、`/demo/b`、未知路徑皆 200（Pages SPA fallback 生效）
+- 深層連結 `/demo/b` 實測：資產載入、標題、父子高亮、群組自動展開正常
+- 實作計畫歸檔至 `1-Plans/archive/plan-phase-1-前端雛形實作計畫.md`
+
 ### 2026-11-06 — 前端雛形實作 T1–T6
 - AppShell/Sidebar/Topbar、NavItem/NavGroup（accordion + collapsed flyout）、Card/StatCard、Dashboard、PlaceholderPage
 - 路由：`/` → Dashboard；其餘走 `Routes fallback=MenuRoutePage`（依 MENU 查標題，未知路徑顯示「找不到頁面」）

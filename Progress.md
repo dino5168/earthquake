@@ -17,6 +17,11 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-10 — 圖片轉 3D 點雲測試（任務：5-3D點雲/1-圖片點雲測試.md）
+- 計畫 `1-Plans/6-圖片點雲測試實作計畫.md`；原圖 girl.png 不使用，改用大衛像
+- `5-3D點雲/image_to_cloud.py`：Depth Anything V2 → 在深度圖上做 Otsu 去背 → 經緯度與深度 → `image-cloud.csv`（16,809 點）
+- 檢視器新增「圖片點雲（測試）」圖層；資料檔 gitignore，所以線上不會出現（只在本機測試，使用者決定）
+- Blender MCP：已連線，但 3D 生成服務都沒開、addon 版本過舊，方案 B 暫緩
 ### 2026-11-10 — 點雲整合進網站 /history 實作計畫（任務：1-Plans/5-將地震點雲放到正是網站.md）
 - 計畫書 `1-Plans/5-地震點雲整合網站實作計畫.md`：評估可行，T1–T6
 - 決策：iframe 嵌入 `/viz/eq-3d/`、3D 填滿整頁、資料（約 4.7 MB）進 git；eq-3d 搬到 `9-Project/viz/eq-3d`；CI 加入 Node／pnpm
@@ -53,7 +58,3 @@
 ### 2026-11-06 — 收工
 - 手動觸發一次 Cloudflare 佈署（與 `main` 一致）；停止本機 trunk serve
 - 今日完成：Phase 0 骨架、Cloudflare 佈署、Phase 1 前端雛形；待 Phase 2 Open Questions
-### 2026-11-06 — Phase 1 驗收（T7）完成
-- 線上 https://earthquake-cm9.pages.dev：`/`、`/history`、`/demo/b`、未知路徑皆 200（Pages SPA fallback 生效）
-- 深層連結 `/demo/b` 實測：資產載入、標題、父子高亮、群組自動展開正常
-- 實作計畫歸檔至 `1-Plans/archive/plan-phase-1-前端雛形實作計畫.md`

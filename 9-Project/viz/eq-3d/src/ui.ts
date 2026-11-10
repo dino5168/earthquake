@@ -1,6 +1,7 @@
 import GUI from "lil-gui";
 import type * as THREE from "three";
 import { DEPTH_STOPS } from "./colormap";
+import type { ImageCloudUniforms } from "./layers/imageCloud";
 import type { PointUniforms } from "./layers/points";
 
 export interface Layers {
@@ -8,6 +9,8 @@ export interface Layers {
   terrain: THREE.Mesh;
   frame: THREE.LineSegments;
   uniforms: PointUniforms;
+  /** Optional local test layer; absent when image-cloud.csv is not deployed. */
+  image: { object: THREE.Points; uniforms: ImageCloudUniforms } | null;
 }
 
 /**
@@ -16,7 +19,7 @@ export interface Layers {
  * @param layers Scene layers to control.
  */
 export function createControls(layers: Layers): void {
-  const { points, terrain, frame, uniforms } = layers;
+  const { points, terrain, frame, uniforms, image } = layers;
   const terrainMat = terrain.material as THREE.MeshLambertMaterial;
   terrain.geometry.computeBoundingBox();
   const seafloorKm = terrain.geometry.boundingBox?.min.y ?? 0;
@@ -30,6 +33,7 @@ export function createControls(layers: Layers): void {
   const applyScale = (): void => {
     points.scale.y = params.depthScale;
     frame.scale.y = params.depthScale;
+    if (image) image.object.scale.y = params.depthScale;
     terrain.scale.y = params.terrainScale;
     // Exaggerated bathymetry (−6.4 km × 10) would swallow the shallow red
     // layer; lifting puts the deepest seafloor at y=0 like the reference image.
@@ -68,6 +72,12 @@ export function createControls(layers: Layers): void {
   ter.add(params, "terrainOpacity", 0, 1, 0.05).name("透明度").onChange((v: number) => {
     terrainMat.opacity = v;
   });
+
+  if (image) {
+    const img = gui.addFolder("圖片點雲（測試）");
+    img.add(image.object, "visible").name("顯示");
+    img.add(image.uniforms.uSize, "value", 0.5, 8, 0.1).name("點大小");
+  }
 }
 
 /**

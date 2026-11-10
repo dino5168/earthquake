@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { parseCatalog } from "./catalog";
+import { parseCatalog, parseImageCloud } from "./catalog";
 import { createFrame } from "./layers/frame";
+import { createImageCloud } from "./layers/imageCloud";
 import { createPoints } from "./layers/points";
 import { createTerrain, parseTerrainMeta } from "./layers/terrain";
 import { createControls, renderLegend } from "./ui";
@@ -20,6 +21,26 @@ async function fetchData(name: string): Promise<Response> {
   const res = await fetch(DATA + name);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   return res;
+}
+
+/**
+ * Load the optional local-only image test layer. image-cloud.csv is gitignored,
+ * so in production the request 404s (or the dev server returns index.html) and
+ * the layer is silently skipped.
+ *
+ * @returns The layer, or null when the data is unavailable.
+ */
+async function loadImageCloud(): Promise<ReturnType<typeof createImageCloud> | null> {
+  try {
+    const res = await fetch(`${DATA}image-cloud.csv`);
+    if (!res.ok) return null;
+    const parsed = parseImageCloud(await res.text());
+    if (parsed.error) return null;
+    return createImageCloud(parsed.data);
+  } catch (e: unknown) {
+    if (e instanceof TypeError) return null; // network failure
+    throw e;
+  }
 }
 
 /** Load data, build the scene and start rendering. */
@@ -63,7 +84,10 @@ async function start(): Promise<void> {
   const frame = createFrame(FRAME_DEPTH_KM);
   scene.add(points, terrain, frame);
 
-  createControls({ points, terrain, frame, uniforms });
+  const image = await loadImageCloud();
+  if (image) scene.add(image.object);
+
+  createControls({ points, terrain, frame, uniforms, image });
   renderLegend(document.getElementById("legend")!);
   status.textContent =
     `${parsed.data.count.toLocaleString()} 筆地震` +
