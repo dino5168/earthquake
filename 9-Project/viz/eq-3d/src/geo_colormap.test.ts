@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { depthColor, elevationColor, hexToRgb, makeRamp } from "./colormap";
+import { elevationColor, hexToRgb, makeRamp } from "./colormap";
 import { toSceneXZ } from "./geo";
 
 describe("toSceneXZ", () => {
@@ -30,14 +30,6 @@ describe("colormap", () => {
     expect(ramp(-5)).toEqual([0, 0, 0]);
     expect(ramp(5)[0]).toBeCloseTo(0.5);
     expect(ramp(50)).toEqual([1, 1, 1]);
-  });
-
-  it("shallow quakes are red, deep ones blue", () => {
-    const [r, , b] = depthColor(5);
-    expect(r).toBeGreaterThan(0.9);
-    expect(b).toBeLessThan(0.3);
-    const deep = depthColor(300);
-    expect(deep[2]).toBeGreaterThan(deep[0]);
   });
 
   it("sea level splits ocean blue from land green", () => {

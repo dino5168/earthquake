@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { Catalog } from "../catalog";
-import { depthColor } from "../colormap";
+import { hexToRgb } from "../colormap";
+import { DEPTH_CLASSES, depthClassOf } from "../depthClass";
 import { toSceneXZ } from "../geo";
 
 /** Runtime-tunable uniforms of the point layer. */
@@ -10,6 +11,8 @@ export interface PointUniforms {
   uMinMag: { value: number };
   uYearMin: { value: number };
   uYearMax: { value: number };
+  /** Per depth class: 1 = shown, 0 = hidden (`DEPTH_CLASSES` order). */
+  uClassMask: { value: number[] };
   uPixelRatio: { value: number };
 }
 
@@ -17,17 +20,20 @@ const vertexShader = /* glsl */ `
   attribute vec3 color;
   attribute float aMag;
   attribute float aYear;
+  attribute float aClass;
   uniform float uSize;
   uniform float uMinMag;
   uniform float uYearMin;
   uniform float uYearMax;
+  uniform float uClassMask[${DEPTH_CLASSES.length}];
   uniform float uPixelRatio;
   varying vec3 vColor;
 
   void main() {
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mv;
-    bool hidden = aMag < uMinMag || aYear < uYearMin || aYear > uYearMax;
+    bool hidden = aMag < uMinMag || aYear < uYearMin || aYear > uYearMax
+      || uClassMask[int(aClass + 0.5)] < 0.5;
     // Energy grows ~31.6x per magnitude unit; 1.6x per unit keeps big events
     // prominent without hiding small ones.
     float size = uSize * pow(1.6, aMag - 3.0) * uPixelRatio * (600.0 / -mv.z);
@@ -62,15 +68,19 @@ const fragmentShader = /* glsl */ `
 export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: PointUniforms } {
   const pos = new Float32Array(cat.count * 3);
   const col = new Float32Array(cat.count * 3);
+  const cls = new Float32Array(cat.count);
+  const palette = DEPTH_CLASSES.map((c) => hexToRgb(c.pointColor));
   for (let i = 0; i < cat.count; i++) {
     const [x, z] = toSceneXZ(cat.lon[i]!, cat.lat[i]!);
     pos.set([x, -cat.depth[i]!, z], i * 3);
-    col.set(depthColor(cat.depth[i]!), i * 3);
+    cls[i] = depthClassOf(cat.depth[i]!);
+    col.set(palette[cls[i]!]!, i * 3);
   }
   const geom = new THREE.BufferGeometry();
   geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
   geom.setAttribute("aMag", new THREE.BufferAttribute(cat.magnitude, 1));
+  geom.setAttribute("aClass", new THREE.BufferAttribute(cls, 1));
   geom.setAttribute("aYear", new THREE.BufferAttribute(new Float32Array(cat.year), 1));
 
   const uniforms: PointUniforms = {
@@ -80,6 +90,7 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
     // reduce, not Math.min(...arr): 73k spread args exceed Safari's 65,536 limit
     uYearMin: { value: cat.year.reduce((a, b) => Math.min(a, b)) },
     uYearMax: { value: cat.year.reduce((a, b) => Math.max(a, b)) },
+    uClassMask: { value: DEPTH_CLASSES.map(() => 1) },
     uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
   };
   const material = new THREE.ShaderMaterial({

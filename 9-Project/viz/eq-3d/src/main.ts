@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 import { parseCatalog, parseImageCloud } from "./catalog";
+import { countByClass } from "./depthClass";
+import { createAxes } from "./layers/axes";
 import { createFrame } from "./layers/frame";
 import { createImageCloud } from "./layers/imageCloud";
 import { createPoints } from "./layers/points";
@@ -59,7 +62,13 @@ async function start(): Promise<void> {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById("app")!.appendChild(renderer.domElement);
+  const app = document.getElementById("app")!;
+  app.appendChild(renderer.domElement);
+  // Axis labels are DOM elements overlaid on the canvas; pointer-events: none in CSS keeps OrbitControls working
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.className = "label-layer";
+  app.appendChild(labelRenderer.domElement);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x05070d);
@@ -82,13 +91,15 @@ async function start(): Promise<void> {
   const { object: points, uniforms } = createPoints(parsed.data);
   const terrain = createTerrain(parseTerrainMeta(meta), new Int16Array(bin));
   const frame = createFrame(FRAME_DEPTH_KM);
-  scene.add(points, terrain, frame);
+  const axes = createAxes(FRAME_DEPTH_KM);
+  scene.add(points, terrain, frame, axes);
 
   const image = await loadImageCloud();
   if (image) scene.add(image.object);
 
-  createControls({ points, terrain, frame, uniforms, image });
-  renderLegend(document.getElementById("legend")!);
+  const classCounts = countByClass(parsed.data.depth);
+  createControls({ points, terrain, frame, axes, uniforms, image, classCounts });
+  renderLegend(document.getElementById("legend")!, classCounts);
   status.textContent =
     `${parsed.data.count.toLocaleString()} 筆地震` +
     `（${uniforms.uYearMin.value}–${uniforms.uYearMax.value}, ML ≥ 3）`;
@@ -97,10 +108,12 @@ async function start(): Promise<void> {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
   });
   renderer.setAnimationLoop(() => {
     controls.update();
     renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
   });
 }
 

@@ -1,21 +1,10 @@
-/** Piecewise-linear colour ramps for depth and elevation. */
+/** Piecewise-linear colour ramp for terrain elevation. */
 
 export type RGB = [number, number, number];
 export interface Stop {
   value: number;
   color: string;
 }
-
-/** Earthquake depth (km, positive down). 81% of events are < 50 km, so the
- * shallow band is split finely to reproduce the red/yellow layering. */
-export const DEPTH_STOPS: readonly Stop[] = [
-  { value: 0, color: "#ff1e3c" },
-  { value: 25, color: "#ff2a3a" },
-  { value: 45, color: "#ffd21f" },
-  { value: 90, color: "#2ee86a" },
-  { value: 160, color: "#22d3d6" },
-  { value: 300, color: "#3b6bff" },
-];
 
 /** Terrain elevation (m). Ocean blues below 0, land greens/ochres above. */
 export const ELEVATION_STOPS: readonly Stop[] = [
@@ -66,5 +55,4 @@ export function makeRamp(stops: readonly Stop[]): (v: number) => RGB {
   };
 }
 
-export const depthColor = makeRamp(DEPTH_STOPS);
 export const elevationColor = makeRamp(ELEVATION_STOPS);

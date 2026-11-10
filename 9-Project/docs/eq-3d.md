@@ -5,6 +5,10 @@
   Trunk 在 `crates/frontend/index.html` 用 `copy-dir` 把 `viz/eq-3d/dist` 複製到網站的 `dist/viz/eq-3d`。
 - 在 iframe 內會自動隱藏標題；螢幕寬度小於 768px 時，控制面板預設收合，直式畫面的鏡頭會自動拉遠。
 
+## 深度分類與座標軸
+- 震源深度分類放在 `src/depthClass.ts`（`DEPTH_CLASSES`），依 CWA 地震百問 14 分為四類：0–30／30–70／70–300／300–700 km。圖例使用 CWA 原色；`pointColor` 只在深色背景看不清楚時才另外指定。
+- 座標軸放在 `src/layers/axes.ts`：經度標在外框南緣，緯度標在東緣，深度標在西南角的垂直邊。標籤用 three 內建的 `CSS2DRenderer`，會跟著深度倍率移動。
+
 ## 本機開發
 ```powershell
 cd 9-Project/viz/eq-3d; pnpm install; pnpm dev        # 單獨開發檢視器：http://localhost:5173/viz/eq-3d/
