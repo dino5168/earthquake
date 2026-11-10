@@ -1,14 +1,13 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
-import { parseCatalog, parseImageCloud } from "./catalog";
+import { parseCatalog } from "./catalog";
 import { DEPTH_CLASSES } from "./depthClass";
 import { renderLegend } from "./legend";
 import { MAGNITUDE_CLASSES } from "./magnitudeClass";
 import { countByClass } from "./rangeClass";
 import { createAxes } from "./layers/axes";
 import { createFrame } from "./layers/frame";
-import { createImageCloud } from "./layers/imageCloud";
 import { createPoints } from "./layers/points";
 import { createTerrain, parseTerrainMeta } from "./layers/terrain";
 import { createControls } from "./ui";
@@ -27,26 +26,6 @@ async function fetchData(name: string): Promise<Response> {
   const res = await fetch(DATA + name);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   return res;
-}
-
-/**
- * Load the optional local-only image test layer. image-cloud.csv is gitignored,
- * so in production the request 404s (or the dev server returns index.html) and
- * the layer is silently skipped.
- *
- * @returns The layer, or null when the data is unavailable.
- */
-async function loadImageCloud(): Promise<ReturnType<typeof createImageCloud> | null> {
-  try {
-    const res = await fetch(`${DATA}image-cloud.csv`);
-    if (!res.ok) return null;
-    const parsed = parseImageCloud(await res.text());
-    if (parsed.error) return null;
-    return createImageCloud(parsed.data);
-  } catch (e: unknown) {
-    if (e instanceof TypeError) return null; // network failure
-    throw e;
-  }
 }
 
 /** Load data, build the scene and start rendering. */
@@ -97,13 +76,10 @@ async function start(): Promise<void> {
   const axes = createAxes(FRAME_DEPTH_KM);
   scene.add(points, terrain, frame, axes);
 
-  const image = await loadImageCloud();
-  if (image) scene.add(image.object);
-
   const classCounts = countByClass(parsed.data.depth, DEPTH_CLASSES);
   const magCounts = countByClass(parsed.data.magnitude, MAGNITUDE_CLASSES);
   const onMagClassMode = renderLegend(document.getElementById("legend")!, classCounts, magCounts);
-  createControls({ points, terrain, frame, axes, uniforms, image, classCounts, onMagClassMode });
+  createControls({ points, terrain, frame, axes, uniforms, classCounts, onMagClassMode });
   status.textContent =
     `${parsed.data.count.toLocaleString()} 筆地震` +
     `（${uniforms.uYearMin.value}–${uniforms.uYearMax.value}, ML ≥ 3）`;

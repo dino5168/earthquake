@@ -2,7 +2,7 @@ import * as THREE from "three";
 import type { Catalog } from "../catalog";
 import { hexToRgb } from "../colormap";
 import { DEPTH_CLASSES } from "../depthClass";
-import { MAGNITUDE_CLASSES } from "../magnitudeClass";
+import { MAGNITUDE_CLASSES, magnitudeColor } from "../magnitudeClass";
 import { classOf } from "../rangeClass";
 import { toSceneXZ } from "../geo";
 
@@ -15,7 +15,7 @@ export interface PointUniforms {
   uYearMax: { value: number };
   /** Per depth class: 1 = shown, 0 = hidden (`DEPTH_CLASSES` order). */
   uClassMask: { value: number[] };
-  /** 0 = size grows continuously with ML, 1 = fixed size per magnitude class. */
+  /** 0 = depth colour + continuous size, 1 = magnitude gradient colour + class size. */
   uMagClassMode: { value: number };
   /** Size multiplier per magnitude class (`MAGNITUDE_CLASSES` order). */
   uMagClassSize: { value: number[] };
@@ -24,6 +24,7 @@ export interface PointUniforms {
 
 const vertexShader = /* glsl */ `
   attribute vec3 color;
+  attribute vec3 aMagColor;
   attribute float aMag;
   attribute float aYear;
   attribute float aClass;
@@ -50,7 +51,7 @@ const vertexShader = /* glsl */ `
       : pow(1.6, aMag - 3.0);
     float size = uSize * scale * uPixelRatio * (600.0 / -mv.z);
     gl_PointSize = hidden ? 0.0 : size;
-    vColor = color;
+    vColor = uMagClassMode > 0.5 ? aMagColor : color;
   }
 `;
 
@@ -80,6 +81,7 @@ const fragmentShader = /* glsl */ `
 export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: PointUniforms } {
   const pos = new Float32Array(cat.count * 3);
   const col = new Float32Array(cat.count * 3);
+  const magCol = new Float32Array(cat.count * 3);
   const cls = new Float32Array(cat.count);
   const magCls = new Float32Array(cat.count);
   const palette = DEPTH_CLASSES.map((c) => hexToRgb(c.pointColor));
@@ -88,11 +90,14 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
     pos.set([x, -cat.depth[i]!, z], i * 3);
     cls[i] = classOf(cat.depth[i]!, DEPTH_CLASSES);
     magCls[i] = classOf(cat.magnitude[i]!, MAGNITUDE_CLASSES);
+    magCol.set(magnitudeColor(cat.magnitude[i]!), i * 3);
     col.set(palette[cls[i]!]!, i * 3);
   }
   const geom = new THREE.BufferGeometry();
   geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  // Both colour sets live on the GPU so toggling the mode needs no buffer rebuild
+  geom.setAttribute("aMagColor", new THREE.BufferAttribute(magCol, 3));
   geom.setAttribute("aMag", new THREE.BufferAttribute(cat.magnitude, 1));
   geom.setAttribute("aClass", new THREE.BufferAttribute(cls, 1));
   geom.setAttribute("aMagClass", new THREE.BufferAttribute(magCls, 1));

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { hexToRgb } from "./colormap";
 import { DEPTH_CLASSES } from "./depthClass";
-import { MAGNITUDE_CLASSES } from "./magnitudeClass";
+import { MAGNITUDE_CLASSES, MAGNITUDE_COLOR_STOPS, magnitudeColor } from "./magnitudeClass";
 import { classOf, countByClass, type RangeClass } from "./rangeClass";
 
 /**
@@ -70,5 +71,23 @@ describe("countByClass", () => {
   it("counts values per class", () => {
     expect(countByClass(new Float32Array([5, 10, 45, 120, 310]), DEPTH_CLASSES)).toEqual([2, 1, 1, 1]);
     expect(countByClass([3.2, 5.1, 7.3], MAGNITUDE_CLASSES)).toEqual([0, 1, 1, 1]);
+  });
+});
+
+describe("magnitudeColor", () => {
+  it("uses the CWA FAQ 33 colour bar", () => {
+    expect(MAGNITUDE_COLOR_STOPS.map((s) => s.color)).toEqual(["#10b981", "#3b82f6", "#f59e0b", "#ef4444"]);
+  });
+
+  it("hits the class colours exactly on M 3 / 5 / 7 and blends in between", () => {
+    // Interpolation at t = 1 can differ from the stop colour in the last bit
+    const expectRgb = (m: number, hex: string): void =>
+      hexToRgb(hex).forEach((v, k) => expect(magnitudeColor(m)[k]).toBeCloseTo(v, 9));
+    expectRgb(3, "#3b82f6");
+    expectRgb(5, "#f59e0b");
+    expectRgb(7.3, "#ef4444");
+    const mid = magnitudeColor(4);
+    const [blue, orange] = [hexToRgb("#3b82f6"), hexToRgb("#f59e0b")];
+    [0, 1, 2].forEach((k) => expect(mid[k]).toBeCloseTo((blue[k]! + orange[k]!) / 2));
   });
 });

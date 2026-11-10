@@ -101,6 +101,30 @@ body {
   margin-top: 4px;
 }
 
+.legend__list--muted .legend__marker {
+  opacity: 0.3;
+}
+
+.legend__bar {
+  width: 168px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.legend__bar-ticks {
+  position: relative;
+  width: 168px;
+  height: 16px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #aab2c2;
+}
+
+.legend__bar-ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
 .legend__name small {
   margin-left: 6px;
   color: #8d96a8;

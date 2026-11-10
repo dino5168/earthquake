@@ -1,9 +1,6 @@
 /**
- * Parse the viewer's CSV inputs into typed arrays:
- * - EQHistory.csv  (x,y,z,origin_time,magnitude_ml)
- * - image-cloud.csv (x,y,z,r,g,b) — optional, local-only test layer
- *
- * Both share x = lon, y = lat (EPSG:4326 deg), z = −depth km.
+ * Parse EQHistory.csv (x,y,z,origin_time,magnitude_ml) into typed arrays.
+ * x = lon, y = lat (EPSG:4326 deg), z = −depth km.
  */
 
 export interface Catalog {
@@ -19,19 +16,9 @@ export interface Catalog {
   year: Uint16Array;
 }
 
-export interface ImageCloud {
-  count: number;
-  lon: Float32Array;
-  lat: Float32Array;
-  depth: Float32Array;
-  /** Interleaved RGB in 0..1, length count × 3. */
-  rgb: Float32Array;
-}
-
 export type Result<T> = { data: T; error: null } | { data: null; error: Error };
 
 const CATALOG_HEADER = "x,y,z,origin_time,magnitude_ml";
-const IMAGE_HEADER = "x,y,z,r,g,b";
 
 /**
  * Split a header-checked CSV into rows of fixed width. The inputs are produced
@@ -100,33 +87,4 @@ export function parseCatalog(text: string): Result<Catalog> {
     cat.year[i] = Number(cols[3]!.slice(0, 4));
   }
   return { data: cat, error: null };
-}
-
-/**
- * Parse image-cloud.csv produced by 5-3D點雲/image_to_cloud.py.
- *
- * @param text Full CSV text.
- * @returns Parsed cloud, or the first error encountered.
- */
-export function parseImageCloud(text: string): Result<ImageCloud> {
-  const rows = readRows(text, IMAGE_HEADER, 6);
-  if (rows.error) return rows;
-  const n = rows.data.length;
-  const cloud: ImageCloud = {
-    count: n,
-    lon: new Float32Array(n),
-    lat: new Float32Array(n),
-    depth: new Float32Array(n),
-    rgb: new Float32Array(n * 3),
-  };
-  for (let i = 0; i < n; i++) {
-    const cols = rows.data[i]!;
-    const nums = toNumbers(cols, [0, 1, 2, 3, 4, 5]);
-    if (!nums) return { data: null, error: new Error(`bad row ${i + 2}: ${cols.join(",")}`) };
-    cloud.lon[i] = nums[0]!;
-    cloud.lat[i] = nums[1]!;
-    cloud.depth[i] = 0 - nums[2]!;
-    cloud.rgb.set([nums[3]! / 255, nums[4]! / 255, nums[5]! / 255], i * 3);
-  }
-  return { data: cloud, error: null };
 }
