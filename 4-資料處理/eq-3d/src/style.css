@@ -1,0 +1,75 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #05070d;
+  color: #d9dee8;
+  font: 13px/1.5 "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+#app canvas {
+  display: block;
+}
+
+.hud {
+  position: fixed;
+  left: 16px;
+  top: 14px;
+  pointer-events: none;
+}
+
+.hud__title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.hud__status {
+  color: #8d96a8;
+}
+
+.legend {
+  position: fixed;
+  left: 16px;
+  bottom: 40px;
+  width: 120px;
+  pointer-events: none;
+}
+
+.legend__title {
+  margin-bottom: 6px;
+}
+
+.legend__bar {
+  width: 14px;
+  height: 180px;
+  border-radius: 3px;
+}
+
+.legend__ticks {
+  position: absolute;
+  left: 22px;
+  top: 27px;
+  height: 180px;
+}
+
+.legend__ticks span {
+  position: absolute;
+  transform: translateY(-50%);
+  font-variant-numeric: tabular-nums;
+  color: #aab2c2;
+}
+
+.legend__note {
+  margin-top: 8px;
+  color: #8d96a8;
+}
+
+.attribution {
+  position: fixed;
+  right: 12px;
+  bottom: 8px;
+  font-size: 11px;
+  color: #6b7385;
+}
