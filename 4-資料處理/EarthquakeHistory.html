@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>地震目錄欄位說明</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1d1f23; --muted: #5f6670;
+    --border: #e2e3e0; --accent: #b4441f; --accent-soft: #fbeee8;
+    --code-bg: #f0f0ec; --warn-bg: #fff6e0; --warn-border: #e8c46a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16171a; --surface: #1f2125; --text: #e7e8ea; --muted: #9aa1ab;
+      --border: #33363c; --accent: #f08a62; --accent-soft: #3a261e;
+      --code-bg: #2a2d32; --warn-bg: #33291a; --warn-border: #8a6a2a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16171a; --surface: #1f2125; --text: #e7e8ea; --muted: #9aa1ab;
+    --border: #33363c; --accent: #f08a62; --accent-soft: #3a261e;
+    --code-bg: #2a2d32; --warn-bg: #33291a; --warn-border: #8a6a2a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.7 "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { border-bottom: 2px solid var(--accent); padding-bottom: 16px; margin-bottom: 28px; }
+  h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: .02em; }
+  .subtitle { color: var(--muted); margin: 0; }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; padding-left: 10px; border-left: 4px solid var(--accent); }
+  h3 { font-size: 1.05rem; margin: 24px 0 8px; }
+  code {
+    font-family: "Cascadia Code", Consolas, monospace; font-size: .88em;
+    background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
+  }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .meta div { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .meta dt { color: var(--muted); font-size: .82rem; }
+  .meta dd { margin: 2px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--accent-soft); font-size: .85rem; white-space: nowrap; position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.col code { color: var(--accent); font-weight: 600; background: none; padding: 0; }
+  .small { font-size: .86rem; color: var(--muted); }
+  .note {
+    background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px;
+    padding: 12px 16px; margin: 12px 0;
+  }
+  ul { padding-left: 1.3em; }
+  .bar { display: inline-block; height: 8px; background: var(--accent); border-radius: 4px; vertical-align: middle; margin-right: 8px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: .82rem; }
+  @media (max-width: 600px) { h1 { font-size: 1.5rem; } main { padding-top: 24px; } }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>地震目錄 CSV 欄位說明書</h1>
+  <p class="subtitle">十方地震監測網｜CWA 地震目錄（E-A0073-001）轉檔輸出 <code>CSV/CWA-EQ-Catalog-YYYY.csv</code></p>
+</header>
+
+<section>
+  <h2>資料概要</h2>
+  <dl class="meta">
+    <div><dt>資料來源</dt><dd>中央氣象署 CWA 開放資料</dd></div>
+    <div><dt>資料集代碼</dt><dd>E-A0073-001</dd></div>
+    <div><dt>涵蓋期間</dt><dd>1990 – 2025（36 檔）</dd></div>
+    <div><dt>總筆數</dt><dd>73,729</dd></div>
+    <div><dt>規模範圍</dt><dd>ML 3.0 – 7.3</dd></div>
+    <div><dt>收錄範圍</dt><dd>經度 118–124°E、緯度 20–27°N、深度 0–700 km</dd></div>
+  </dl>
+</section>
+
+<section>
+  <h2>檔案規格</h2>
+  <ul>
+    <li>編碼 UTF-8（無 BOM），欄位分隔 <code>,</code>，第一列為欄名，一列一筆地震事件。</li>
+    <li>檔名沿用來源 XML：<code>CWA-EQ-Catalog-1990.xml</code> → <code>CWA-EQ-Catalog-1990.csv</code>。</li>
+    <li>數值保留原始字串格式（例如 <code>33.00</code> 不會變成 <code>33.0</code>），只去掉前後空白。</li>
+    <li>缺值以空字串表示（兩個逗號之間沒有內容）。</li>
+    <li>轉檔程式：<code>cwa_catalog_to_csv.py</code>，筆數必須與 XML 的 <code>RecordNumber</code> 相同，否則報錯。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>欄位定義</h2>
+  <p class="small">「實際值域」與「缺值」統計自 1990–2025 全部 73,729 筆資料。</p>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>#</th><th>CSV 欄位</th><th>XML 標籤</th><th>中文名稱</th><th>型別 / 單位</th><th>說明</th><th>實際值域</th><th>缺值</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td class="col"><code>origin_time</code></td><td><code>OriginTime</code></td><td>發震時間</td><td>ISO 8601<br>UTC+8</td>
+        <td>地震在震源處開始破裂的時間，台灣時間，帶 <code>+08:00</code> 時區。匯入 PostgreSQL <code>timestamptz</code> 時會自動換算成 UTC 儲存。</td>
+        <td class="num">1990-01-01 21:47:59<br>～ 2025-12-31 20:07:32</td><td class="num">0</td></tr>
+      <tr><td>2</td><td class="col"><code>longitude</code></td><td><code>EpicenterLongitude</code></td><td>震央經度</td><td>decimal<br>度（°E）</td>
+        <td>震央（震源在地表的正上方）的經度，十進位度數，對應 EPSG:4326。</td>
+        <td class="num">117.961 ～ 127.367</td><td class="num">0</td></tr>
+      <tr><td>3</td><td class="col"><code>latitude</code></td><td><code>EpicenterLatitude</code></td><td>震央緯度</td><td>decimal<br>度（°N）</td>
+        <td>震央的緯度，十進位度數，對應 EPSG:4326。</td>
+        <td class="num">19.300 ～ 27.431</td><td class="num">0</td></tr>
+      <tr><td>4</td><td class="col"><code>depth_km</code></td><td><code>FocalDepth</code></td><td>震源深度</td><td>decimal<br>公里</td>
+        <td>震源距地表的深度。一般 &lt; 30 km 為淺層地震，70–300 km 為中層地震，&gt; 300 km 為深層地震。</td>
+        <td class="num">0.0 ～ 313.2</td><td class="num">0</td></tr>
+      <tr><td>5</td><td class="col"><code>magnitude_ml</code></td><td><code>LocalMagnitude</code></td><td>芮氏規模</td><td>decimal<br>ML</td>
+        <td>地震釋放能量的大小（芮氏規模／近震規模 ML）。本資料集只收錄 ML ≥ 3.0。</td>
+        <td class="num">3.0 ～ 7.3</td><td class="num">0</td></tr>
+      <tr><td>6</td><td class="col"><code>station_count</code></td><td><code>StationNumber</code></td><td>定位測站數</td><td>integer<br>站</td>
+        <td>參與定位計算的地震測站數量。測站越多，定位通常越可靠。</td>
+        <td class="num">3 ～ 99</td><td class="num">0</td></tr>
+      <tr><td>7</td><td class="col"><code>phase_count</code></td><td><code>PhaseNumber</code></td><td>相位數</td><td>integer<br>個</td>
+        <td>定位時使用的 P 波、S 波到時讀數總數。</td>
+        <td class="num">5 ～ 409</td><td class="num">0</td></tr>
+      <tr><td>8</td><td class="col"><code>min_epicenter_distance_km</code></td><td><code>MinimumEpicenterDistance</code></td><td>最小震央距</td><td>decimal<br>公里</td>
+        <td>震央到最近一個測站的水平距離。距離越近，深度的定位越準確。</td>
+        <td class="num">0.1 ～ 458.0</td><td class="num">2</td></tr>
+      <tr><td>9</td><td class="col"><code>gap_deg</code></td><td><code>gap</code></td><td>最大方位角空隙</td><td>integer<br>度</td>
+        <td>從震央往外看，相鄰兩個測站之間最大的方位角缺口。數值越小代表測站分布越完整；超過 180° 表示所有測站都偏在同一側（常見於海域地震）。</td>
+        <td class="num">10 ～ 356</td><td class="num">0</td></tr>
+      <tr><td>10</td><td class="col"><code>rms_s</code></td><td><code>rms</code></td><td>走時殘差均方根</td><td>decimal<br>秒</td>
+        <td>觀測到時與模型計算到時之差的均方根值，越小代表定位解越吻合觀測資料。</td>
+        <td class="num">0.01 ～ 1.62</td><td class="num">17</td></tr>
+      <tr><td>11</td><td class="col"><code>erh_km</code></td><td><code>erh</code></td><td>水平定位誤差</td><td>decimal<br>公里</td>
+        <td>震央水平位置的估計誤差。</td>
+        <td class="num">0.1 ～ 62.4</td><td class="num">21</td></tr>
+      <tr><td>12</td><td class="col"><code>erz_km</code></td><td><code>erz</code></td><td>垂直定位誤差</td><td>decimal<br>公里</td>
+        <td>震源深度的估計誤差。</td>
+        <td class="num">0.1 ～ 78.4</td><td class="num">54</td></tr>
+      <tr><td>13</td><td class="col"><code>quality</code></td><td><code>Quality</code></td><td>定位品質</td><td>enum<br>A / B / C / D</td>
+        <td>定位結果的品質等級，A 最好、D 最差。見下方代碼表。</td>
+        <td class="num">A、B、C、D</td><td class="num">0</td></tr>
+      <tr><td>14</td><td class="col"><code>review_status</code></td><td><code>ReviewStatus</code></td><td>審核狀態</td><td>enum<br>F / N / X</td>
+        <td>CWA 原始審核代碼。見下方代碼表。</td>
+        <td class="num">F、N、X</td><td class="num">0</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>代碼表</h2>
+
+  <h3>quality — 定位品質</h3>
+  <div class="table-wrap">
+  <table style="min-width: 560px">
+    <thead><tr><th>代碼</th><th>意義</th><th>筆數</th><th>比例</th></tr></thead>
+    <tbody>
+      <tr><td><code>A</code></td><td>最佳</td><td class="num">3,159</td><td class="num"><span class="bar" style="width:17px"></span>4.3%</td></tr>
+      <tr><td><code>B</code></td><td>良好</td><td class="num">18,378</td><td class="num"><span class="bar" style="width:100px"></span>24.9%</td></tr>
+      <tr><td><code>C</code></td><td>普通</td><td class="num">27,017</td><td class="num"><span class="bar" style="width:147px"></span>36.6%</td></tr>
+      <tr><td><code>D</code></td><td>較差</td><td class="num">25,175</td><td class="num"><span class="bar" style="width:137px"></span>34.1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small">分級依 HYPO71 慣例，綜合 <code>rms_s</code>、<code>erh_km</code>、<code>erz_km</code> 判定，大致為：A：rms &lt; 0.15 s、erh ≤ 1 km、erz ≤ 2 km；B：rms &lt; 0.30 s、erh ≤ 2.5 km、erz ≤ 5 km；C：rms &lt; 0.50 s、erh ≤ 5 km；其餘為 D。CWA 在資料集內沒有附上正式門檻，以上僅供參考。</p>
+
+  <h3>review_status — 審核狀態</h3>
+  <div class="table-wrap">
+  <table style="min-width: 560px">
+    <thead><tr><th>代碼</th><th>出現年份</th><th>筆數</th><th>比例</th></tr></thead>
+    <tbody>
+      <tr><td><code>F</code></td><td>1991 起，1993 年後幾乎全部</td><td class="num">66,902</td><td class="num"><span class="bar" style="width:181px"></span>90.7%</td></tr>
+      <tr><td><code>N</code></td><td>集中在 1990–1992</td><td class="num">6,018</td><td class="num"><span class="bar" style="width:16px"></span>8.2%</td></tr>
+      <tr><td><code>X</code></td><td>1992 起零星出現，1998–2001 較多</td><td class="num">809</td><td class="num"><span class="bar" style="width:2px"></span>1.1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note"><strong>待確認：</strong>CWA 在資料集內沒有定義 F / N / X 的意義。從分布來看，<code>N</code> 只集中在早期年份，可能和當時的測站網或作業流程有關。使用前建議向 CWA 查證，在確認之前不要把它當成篩選條件。</div>
+</section>
+
+<section>
+  <h2>使用注意事項</h2>
+  <ul>
+    <li><strong>年度檔是用 UTC 年份切分的。</strong>例如 1990 年檔的範圍是 <code>1990-01-01T08:00+08:00</code> 到 <code>1991-01-01T08:00+08:00</code>，所以台灣時間 1 月 1 日 08:00 以前的地震會放在前一年的檔案裡。依台灣時間做年度統計時，請以 <code>origin_time</code> 重新分組，不要直接用檔名。</li>
+    <li><strong>座標與地圖：</strong>儲存時用 EPSG:4326（經緯度），網頁地圖渲染時轉成 EPSG:3857，例如 <code>ST_Transform(ST_SetSRID(ST_MakePoint(longitude, latitude), 4326), 3857)</code>。</li>
+    <li><strong>品質篩選：</strong>做空間分析或斷層判釋時，建議只用 <code>quality</code> 為 A／B 的資料，或設定 <code>gap_deg</code> &lt; 180。D 級資料多半是海域或測站稀疏地區的地震。</li>
+    <li><strong>缺值：</strong>只有 <code>min_epicenter_distance_km</code>、<code>rms_s</code>、<code>erh_km</code>、<code>erz_km</code> 會出現缺值（共 64 筆事件）。匯入資料庫時這 4 個欄位要允許 <code>NULL</code>。</li>
+    <li><strong>沒有唯一識別碼：</strong>來源資料沒有事件 ID，可以用 <code>origin_time + longitude + latitude</code> 組成自然鍵。</li>
+  </ul>
+</section>
+
+<footer>
+  產生日期 2026-11-10｜統計基準：<code>4-資料處理/CSV/</code> 1990–2025 全部檔案｜原始資料 © 中央氣象署（政府資料開放授權）
+</footer>
+</main>
+</body>
+</html>
