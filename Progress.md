@@ -17,6 +17,10 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端變更自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-10 — 地震點雲 3D 實作計畫（任務：4-資料處理/2-顯示3D.md）
+- 計畫書 `1-Plans/4-地震點雲3D實作計畫.md`：three.js 點雲 + DEM 地形面，T1–T7；評估結論可行
+- 實測：AWS Terrain Tiles 可下載，含海底地形（−6370～3545 m）；73,729 點單一 draw call
+- 決策：`4-資料處理/eq-3d/` 獨立原型（Vite + TS）、不做時間動畫、地形用 AWS Terrain Tiles；待開工 T1
 ### 2026-11-10 — 地震目錄轉點雲（任務：4-資料處理/1-整理資料成點雲.md）
 - `4-資料處理/csv_to_point_cloud.py` + pytest；輸出 `EQHistory.CSV`（73,729 點，依時間排序，已 gitignore）
 - 欄位 `x,y,z,origin_time,magnitude_ml`：x=經度、y=緯度（度）、z=-深度（km）；使用者選經緯度原值（水平/垂直單位不同，3D 檢視需自行縮放 z）
@@ -52,7 +56,3 @@
 - 決策：建議選單清單 + 1 個測試子選單；< 768px 抽屜；參考圖配色；Lucide icon（leptos_icons）
 - 任務備註寫成規則：`.claude/rules/engineering.md`（全域）、`frontend.md`（paths 限定）
 - 滾動計畫：Phase 0 歸檔至 `archive/plan-phase-0.md`；新增 Phase 1 前端雛形，原 Phase 1–5 順延
-### 2026-11-06 — 前端佈署 Cloudflare Pages（任務：2-Tasks/2-Cloudflare-佈署.md）
-- GitHub Actions `deploy-frontend.yml`：trunk build → wrangler pages deploy
-- Pages 專案 `earthquake`，網址 https://earthquake-cm9.pages.dev（`earthquake` 已被占用，自動加後綴）
-- 踩雷：誤用 Global API Key 導致 auth 10000/6111；需用 API Token（Account → Cloudflare Pages → Edit）
