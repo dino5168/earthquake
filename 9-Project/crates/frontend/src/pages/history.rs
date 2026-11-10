@@ -1,7 +1,8 @@
 use leptos::prelude::*;
 
 /// Static sub-site built from `9-Project/viz/eq-3d` and copied in by Trunk.
-const VIEWER_URL: &str = "/viz/eq-3d/index.html";
+/// Directory form: Cloudflare Pages 308-redirects `.../index.html` to it.
+const VIEWER_URL: &str = "/viz/eq-3d/";
 
 /// 歷史查詢: embeds the three.js earthquake point-cloud viewer.
 ///
