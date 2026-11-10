@@ -21,7 +21,7 @@
 - `build_terrain.py`：AWS Terrarium z7 → 601×701 Int16 網格（EPSG:3857 → 4326 重採樣）；玉山 3616 m、花蓮外海 −3707 m
 - Vite 8 + TS 7 strict + three 0.187 + lil-gui；vitest 9 tests、pytest 18 tests、`pnpm build` 通過，console 無錯誤
 - 與參考圖差異的調整：地形放大 10 倍後海底 −64 km 會吞掉淺層點 → 預設「地形浮於點雲上」（最深海床對齊 y=0）
-- 啟動：`cd 4-資料處理/eq-3d; pnpm install; pnpm dev`；T7 待使用者比對參考圖確認
+- 啟動：`cd 4-資料處理/eq-3d; pnpm install; pnpm dev`；T7 使用者確認，暫不調整
 ### 2026-11-10 — 地震點雲 3D 實作計畫（任務：4-資料處理/2-顯示3D.md）
 - 計畫書 `1-Plans/4-地震點雲3D實作計畫.md`：three.js 點雲 + DEM 地形面，T1–T7；評估結論可行
 - 實測：AWS Terrain Tiles 可下載，含海底地形（−6370～3545 m）；73,729 點單一 draw call
