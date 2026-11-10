@@ -23,6 +23,7 @@
 - T1–T5 完成：eq-3d 搬到 `9-Project/viz/eq-3d`（base `/viz/eq-3d/`，資料進 git）；`HistoryPage` iframe；Trunk copy-dir；CI 加 pnpm/Node
 - 本機驗收：桌機與 400px 寬度都正常，console 無錯誤；手機寬度時控制面板預設收合、鏡頭自動拉遠；年份範圍改為從資料計算
 - 流程文件：`9-Project/docs/eq-3d.md`
+- T6 線上驗收通過：https://earthquake-cm9.pages.dev/history（iframe 指向 `/viz/eq-3d/`，避免 Pages 的 308 轉址）
 ### 2026-11-10 — 地震點雲 3D 原型 T1–T6 完成（`4-資料處理/eq-3d/`）
 - `build_terrain.py`：AWS Terrarium z7 → 601×701 Int16 網格（EPSG:3857 → 4326 重採樣）；玉山 3616 m、花蓮外海 −3707 m
 - Vite 8 + TS 7 strict + three 0.187 + lil-gui；vitest 9 tests、pytest 18 tests、`pnpm build` 通過，console 無錯誤
