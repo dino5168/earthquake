@@ -1,0 +1,15 @@
+{
+  "west": 118.0,
+  "east": 124.0,
+  "south": 20.0,
+  "north": 27.0,
+  "step": 0.01,
+  "width": 601,
+  "height": 701,
+  "crs": "EPSG:4326",
+  "unit": "m",
+  "order": "row-major, north row first",
+  "min": -6405,
+  "max": 3654,
+  "source": "AWS Open Data Terrain Tiles (Terrarium); SRTM, GMTED, ETOPO1 et al."
+}

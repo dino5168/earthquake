@@ -38,6 +38,8 @@ export function createControls(layers: Layers): void {
   applyScale();
 
   const gui = new GUI({ title: "控制面板" });
+  // On phones the open panel covers most of the scene
+  if (window.innerWidth < 768) gui.close();
   const view = gui.addFolder("比例");
   view.add(params, "depthScale", 0.5, 5, 0.1).name("深度倍率").onChange(applyScale);
   view.add(params, "terrainScale", 1, 30, 1).name("地形倍率").onChange(applyScale);
@@ -47,8 +49,10 @@ export function createControls(layers: Layers): void {
   pts.add(uniforms.uSize, "value", 0.5, 8, 0.1).name("點大小");
   pts.add(uniforms.uOpacity, "value", 0.1, 1, 0.05).name("亮度");
   pts.add(uniforms.uMinMag, "value", 3, 7, 0.1).name("最小規模 ML");
-  const yearMin = pts.add(uniforms.uYearMin, "value", 1990, 2025, 1).name("起始年");
-  const yearMax = pts.add(uniforms.uYearMax, "value", 1990, 2025, 1).name("結束年");
+  // Slider bounds come from the data so a new catalog year needs no code change
+  const [y0, y1] = [uniforms.uYearMin.value, uniforms.uYearMax.value];
+  const yearMin = pts.add(uniforms.uYearMin, "value", y0, y1, 1).name("起始年");
+  const yearMax = pts.add(uniforms.uYearMax, "value", y0, y1, 1).name("結束年");
   // Keep the range valid when one handle passes the other
   yearMin.onChange((v: number) => {
     if (v > uniforms.uYearMax.value) yearMax.setValue(v);

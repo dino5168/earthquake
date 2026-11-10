@@ -25,6 +25,8 @@ async function fetchData(name: string): Promise<Response> {
 /** Load data, build the scene and start rendering. */
 async function start(): Promise<void> {
   const status = document.getElementById("status")!;
+  // Embedded in the site's /history page, whose topbar already shows a title
+  if (window.self !== window.top) document.querySelector(".hud__title")?.remove();
   const [csv, meta, bin] = await Promise.all([
     fetchData("EQHistory.csv").then((r) => r.text()),
     fetchData("terrain.json").then((r) => r.json() as Promise<unknown>),
@@ -50,6 +52,9 @@ async function start(): Promise<void> {
   camera.position.set(-60, 120, 950);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(20, -110, 0);
+  // Portrait screens: pull back so the whole frame width stays visible
+  const fit = Math.max(1, 1.4 / camera.aspect);
+  camera.position.sub(controls.target).multiplyScalar(fit).add(controls.target);
   controls.enableDamping = true;
   controls.update();
 
@@ -60,7 +65,9 @@ async function start(): Promise<void> {
 
   createControls({ points, terrain, frame, uniforms });
   renderLegend(document.getElementById("legend")!);
-  status.textContent = `${parsed.data.count.toLocaleString()} 筆地震（1990–2025, ML ≥ 3）`;
+  status.textContent =
+    `${parsed.data.count.toLocaleString()} 筆地震` +
+    `（${uniforms.uYearMin.value}–${uniforms.uYearMax.value}, ML ≥ 3）`;
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;

@@ -4,7 +4,7 @@ Downloads AWS Open Data Terrain Tiles (Terrarium PNG, EPSG:3857), stitches
 them, and resamples onto a regular EPSG:4326 grid.
 
 Output (little-endian Int16, row-major, north row first, metres):
-    eq-3d/public/data/terrain.bin + terrain.json
+    9-Project/viz/eq-3d/public/data/terrain.bin + terrain.json
 
 Usage:
     uv run --no-project --with numpy --with pillow build_terrain.py
@@ -210,7 +210,11 @@ def main(argv: list[str] | None = None) -> int:
     """
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--zoom", type=int, default=7)
-    parser.add_argument("--out-dir", type=Path, default=HERE / "eq-3d" / "public" / "data")
+    parser.add_argument(
+        "--out-dir",
+        type=Path,
+        default=HERE.parent / "9-Project" / "viz" / "eq-3d" / "public" / "data",
+    )
     parser.add_argument("--cache-dir", type=Path, default=HERE / ".cache" / "terrarium")
     args = parser.parse_args(argv)
 

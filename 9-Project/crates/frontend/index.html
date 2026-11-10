@@ -6,6 +6,8 @@
     <title>十方地震監測網</title>
     <link data-trunk rel="scss" href="styles/main.scss" />
     <link data-trunk rel="rust" data-wasm-opt="z" />
+    <!-- 3D viewer sub-site; build first: pnpm --dir ../../viz/eq-3d build -->
+    <link data-trunk rel="copy-dir" href="../../viz/eq-3d/dist" data-target-path="viz/eq-3d" />
   </head>
   <body></body>
 </html>

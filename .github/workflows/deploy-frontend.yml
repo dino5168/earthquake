@@ -6,6 +6,7 @@ on:
     paths:
       - "9-Project/crates/frontend/**"
       - "9-Project/crates/shared/**"
+      - "9-Project/viz/**"
       - "9-Project/Cargo.lock"
       - ".github/workflows/deploy-frontend.yml"
   workflow_dispatch:
@@ -30,6 +31,24 @@ jobs:
         working-directory: 9-Project/crates/frontend
     steps:
       - uses: actions/checkout@v5
+
+      # 3D viewer sub-site (Vite); Trunk copies its dist/ to /viz/eq-3d via copy-dir.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 9-Project/viz/eq-3d/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: 9-Project/viz/eq-3d/pnpm-lock.yaml
+
+      - name: Build 3D viewer
+        working-directory: 9-Project/viz/eq-3d
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm build
 
       - uses: dtolnay/rust-toolchain@stable
         with:

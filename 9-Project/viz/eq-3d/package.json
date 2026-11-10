@@ -2,11 +2,10 @@
   "name": "eq-3d",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
-    "copy-data": "node scripts/copy-data.mjs",
-    "predev": "node scripts/copy-data.mjs",
+    "update-data": "node scripts/update-data.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/copy-data.mjs",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

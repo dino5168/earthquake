@@ -1,0 +1,25 @@
+@use "../tokens" as *;
+
+// Fill the content area below the sticky topbar; the shell uses min-height,
+// so percentage heights would not resolve.
+.history-page {
+  height: calc(100dvh - var(--topbar-h) - 2 * var(--space-5));
+  min-height: var(--viewer-min-h);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--sidebar-bg);
+  box-shadow: var(--shadow-card);
+}
+
+.history-page__viewer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (max-width: $mobile-max) {
+  .history-page {
+    height: calc(100dvh - var(--topbar-h) - 2 * var(--space-4));
+  }
+}

@@ -77,8 +77,9 @@ export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: Po
     uSize: { value: 4 },
     uOpacity: { value: 0.9 },
     uMinMag: { value: 3 },
-    uYearMin: { value: 1990 },
-    uYearMax: { value: 2025 },
+    // reduce, not Math.min(...arr): 73k spread args exceed Safari's 65,536 limit
+    uYearMin: { value: cat.year.reduce((a, b) => Math.min(a, b)) },
+    uYearMax: { value: cat.year.reduce((a, b) => Math.max(a, b)) },
     uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
   };
   const material = new THREE.ShaderMaterial({
