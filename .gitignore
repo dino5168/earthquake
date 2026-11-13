@@ -30,3 +30,6 @@ __pycache__/
 /4-資料處理/CSV/
 /4-資料處理/.cache/
 
+
+# USGS 資料快照（/history/usgs 改為瀏覽器直接查詢 USGS，不需版控）
+/5-地震資料/
