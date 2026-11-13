@@ -4,6 +4,7 @@ import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 import { parseCatalog } from "./catalog";
 import { DEPTH_CLASSES } from "./depthClass";
 import { renderLegend } from "./legend";
+import { toScenePositions } from "./geo";
 import { MAGNITUDE_CLASSES } from "./magnitudeClass";
 import { countByClass } from "./rangeClass";
 import { createAxes } from "./layers/axes";
@@ -71,7 +72,7 @@ async function start(): Promise<void> {
   controls.enableDamping = true;
   controls.update();
 
-  const { object: points, uniforms } = createPoints(parsed.data);
+  const { object: points, uniforms } = createPoints(parsed.data, toScenePositions(parsed.data));
   const terrain = createTerrain(parseTerrainMeta(meta), new Int16Array(bin));
   const frame = createFrame(FRAME_DEPTH_KM);
   const axes = createAxes(FRAME_DEPTH_KM);

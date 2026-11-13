@@ -4,7 +4,6 @@ import { hexToRgb } from "../colormap";
 import { DEPTH_CLASSES } from "../depthClass";
 import { MAGNITUDE_CLASSES, magnitudeColor } from "../magnitudeClass";
 import { classOf } from "../rangeClass";
-import { toSceneXZ } from "../geo";
 
 /** Runtime-tunable uniforms of the point layer. */
 export interface PointUniforms {
@@ -72,29 +71,31 @@ const fragmentShader = /* glsl */ `
 /**
  * Build the earthquake point cloud.
  *
- * Positions are stored with y = −depth (km); vertical exaggeration is applied
- * through `object.scale.y` so it can change without rebuilding buffers.
+ * Positions come from the caller so the same layer serves the flat Taiwan
+ * scene and the globe; colours, classes and filters depend only on `cat`.
  *
  * @param cat Parsed catalog.
+ * @param positions Scene xyz per event, `cat.count * 3` long.
  * @returns The points object and its uniforms.
  */
-export function createPoints(cat: Catalog): { object: THREE.Points; uniforms: PointUniforms } {
-  const pos = new Float32Array(cat.count * 3);
+export function createPoints(
+  cat: Catalog,
+  positions: Float32Array,
+): { object: THREE.Points; uniforms: PointUniforms } {
+  if (positions.length !== cat.count * 3) throw new Error("positions length mismatch");
   const col = new Float32Array(cat.count * 3);
   const magCol = new Float32Array(cat.count * 3);
   const cls = new Float32Array(cat.count);
   const magCls = new Float32Array(cat.count);
   const palette = DEPTH_CLASSES.map((c) => hexToRgb(c.pointColor));
   for (let i = 0; i < cat.count; i++) {
-    const [x, z] = toSceneXZ(cat.lon[i]!, cat.lat[i]!);
-    pos.set([x, -cat.depth[i]!, z], i * 3);
     cls[i] = classOf(cat.depth[i]!, DEPTH_CLASSES);
     magCls[i] = classOf(cat.magnitude[i]!, MAGNITUDE_CLASSES);
     magCol.set(magnitudeColor(cat.magnitude[i]!), i * 3);
     col.set(palette[cls[i]!]!, i * 3);
   }
   const geom = new THREE.BufferGeometry();
-  geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
   // Both colour sets live on the GPU so toggling the mode needs no buffer rebuild
   geom.setAttribute("aMagColor", new THREE.BufferAttribute(magCol, 3));

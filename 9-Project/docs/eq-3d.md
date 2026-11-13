@@ -1,7 +1,10 @@
 # 地震點雲 3D 檢視器（`9-Project/viz/eq-3d`）
 
 - 技術：Vite + TypeScript strict + three.js + lil-gui；建置輸出 `dist/`，`base` 為 `/viz/eq-3d/`。
-- 嵌入方式：Leptos `/history` 頁（`crates/frontend/src/pages/history.rs`）用 iframe 載入 `/viz/eq-3d/index.html`。
+- 兩個頁面（Vite multi-page，`vite.config.ts`）：
+  - `/viz/eq-3d/`：台灣，CWA 地震目錄 + 台灣地形（`src/main.ts`）
+  - `/viz/eq-3d/usgs/`：全球地球，瀏覽器直接查 USGS（`usgs/index.html`、`src/usgs/`）
+- 嵌入方式：Leptos 路由 `/history/taiwan`、`/history/usgs`（`crates/frontend/src/pages/history.rs` 的 `TAIWAN_VIEWER`／`USGS_VIEWER`）用 iframe 載入；舊網址 `/history` 轉址到 `/history/taiwan`。
   Trunk 在 `crates/frontend/index.html` 用 `copy-dir` 把 `viz/eq-3d/dist` 複製到網站的 `dist/viz/eq-3d`。
 - 在 iframe 內會自動隱藏標題；螢幕寬度小於 768px 時，控制面板預設收合，直式畫面的鏡頭會自動拉遠。
 
@@ -12,11 +15,17 @@
 - 座標軸放在 `src/layers/axes.ts`：經度標在外框南緣，緯度標在東緣，深度標在西南角的垂直邊。標籤用 three 內建的 `CSS2DRenderer`，會跟著深度倍率移動。
 - 格線放在 `src/layers/grid.ts`：海平面（Z=0）有 1° 經緯線，北牆和東牆有經緯度垂直線和深度水平線，由「經緯度與深度格線」切換。格線比地形（`renderOrder` 2）先繪製，所以被地形蓋住時仍會隱約透出。
 
+## USGS 全球地球（`/viz/eq-3d/usgs/`）
+- 資料：瀏覽器直接呼叫 USGS FDSN Event API（`src/usgs/query.ts`；對方回 `Access-Control-Allow-Origin: *`），不存檔、不經後端。查詢條件是 UTC 起訖日期（兩端都含）和最小規模，預設是近 30 天、M ≥ 4.5。單次上限 20,000 筆，達上限時狀態列會提示。
+- 地球：`src/layers/globe.ts`。半徑 100 個場景單位代表 6371 km；`globePosition` 和 `THREE.SphereGeometry` 用同一套角度定義，所以等距圓柱貼圖會和地震點對齊（有測試）。震源依深度往球心內縮，可調深度倍率。
+- 地表貼圖：從 `public/data/globe-terrain.{bin,json}`（全球 0.25° 高程）用 `elevationColor` 著色。產生方式（在 `4-資料處理` 執行一次）：`uv run --no-project --with numpy --with pillow build_terrain.py --region globe`
+- 點雲 shader、深度/規模分類與圖例都和台灣頁共用（`createPoints` 接收位置陣列）。
+
 ## 本機開發
 ```powershell
 cd 9-Project/viz/eq-3d; pnpm install; pnpm dev        # 單獨開發檢視器：http://localhost:5173/viz/eq-3d/
 pnpm build                                            # 給 trunk serve 用：必須先建置，否則 copy-dir 找不到 dist
-cd ../../crates/frontend; trunk serve                 # http://127.0.0.1:3000/history
+cd ../../crates/frontend; trunk serve                 # http://127.0.0.1:3000/history/taiwan、/history/usgs
 ```
 - Trunk 不會監看 `viz/` 目錄。重新 `pnpm build` 之後，要儲存一次 `crates/frontend/index.html`，或重啟 `trunk serve`。
 

@@ -1,3 +1,5 @@
+import type { Catalog } from "./catalog";
+
 /**
  * EPSG:4326 (lon/lat degrees) → local scene plane in km.
  *
@@ -25,4 +27,20 @@ export const EXTENT = { west: 118, east: 124, south: 20, north: 27 } as const;
  */
 export function toSceneXZ(lon: number, lat: number): [number, number] {
   return [(lon - ORIGIN_LON) * KM_PER_DEG_LON, -(lat - ORIGIN_LAT) * KM_PER_DEG_LAT];
+}
+
+/**
+ * Flat-scene positions for every event: y = −depth (km). Vertical exaggeration
+ * is applied through `object.scale.y` so it can change without rebuilding buffers.
+ *
+ * @param cat Parsed catalog.
+ * @returns xyz per event.
+ */
+export function toScenePositions(cat: Catalog): Float32Array {
+  const pos = new Float32Array(cat.count * 3);
+  for (let i = 0; i < cat.count; i++) {
+    const [x, z] = toSceneXZ(cat.lon[i]!, cat.lat[i]!);
+    pos.set([x, -cat.depth[i]!, z], i * 3);
+  }
+  return pos;
 }

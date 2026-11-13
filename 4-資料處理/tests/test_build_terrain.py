@@ -11,9 +11,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import build_terrain  # noqa: E402
 from build_terrain import (  # noqa: E402
+    REGIONS,
     GridSpec,
     bilinear,
+    build_grid,
     decode_terrarium,
     lat_to_px,
     lon_to_px,
@@ -53,3 +56,33 @@ def test_write_grid(tmp_path: Path) -> None:
     assert raw.tolist() == [1, 2, 3, -4, -5, -6]
     meta = json.loads((tmp_path / "terrain.json").read_text(encoding="utf-8"))
     assert (meta["width"], meta["height"], meta["min"], meta["max"]) == (3, 2, -6, 3)
+
+
+def test_globe_region_size() -> None:
+    spec = REGIONS["globe"].spec
+    assert (spec.width, spec.height) == (1441, 721)
+
+
+def test_build_grid_global_stays_inside_world(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    requested: list[tuple[int, int, int]] = []
+
+    def fake_tile(z: int, x: int, y: int, cache_dir: Path) -> np.ndarray:
+        requested.append((z, x, y))
+        return np.full((256, 256), 100.0)
+
+    monkeypatch.setattr(build_terrain, "fetch_tile", fake_tile)
+    spec = GridSpec(-180.0, 180.0, -90.0, 90.0, 10.0)
+    grid = build_grid(spec, 1, tmp_path)
+    # Poles and lon 180 must clamp to the 2x2 world mosaic, not request tile x/y = 2
+    assert sorted(requested) == [(1, 0, 0), (1, 0, 1), (1, 1, 0), (1, 1, 1)]
+    assert grid.shape == (19, 37)
+    assert (grid == 100).all()
+
+
+def test_write_grid_prefix(tmp_path: Path) -> None:
+    spec = GridSpec(west=0, east=0.01, south=0, north=0.01, step=0.01)
+    write_grid(np.zeros((2, 2), dtype=np.int16), spec, tmp_path, "globe-")
+    assert (tmp_path / "globe-terrain.bin").exists()
+    assert (tmp_path / "globe-terrain.json").exists()

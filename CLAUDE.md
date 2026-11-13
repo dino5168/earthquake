@@ -27,7 +27,7 @@ Browser ──▶ Cloudflare Pages (Leptos CSR / WASM)
   crates/backend/          axum + sqlx + tokio
     migrations/            sqlx migrations
   crates/frontend/         Leptos CSR，trunk 建置 → Cloudflare Pages
-  viz/eq-3d/               three.js 地震點雲（Vite），iframe 嵌入 /history
+  viz/eq-3d/               three.js 地震 3D（Vite，台灣＋USGS 地球），iframe 嵌入 /history/*
   deploy/cloudflared/      Tunnel 設定範本
   docs/                    API / DB schema 等細節文件
 scripts/                   維運腳本（如文件大小檢查）
@@ -36,7 +36,7 @@ scripts/                   維運腳本（如文件大小檢查）
 ## 常用指令（於 `9-Project/` 執行，PowerShell）
 - 後端檢查/測試：`cargo check -p backend; cargo test -p backend -p shared`
 - 後端啟動：`cargo run -p backend`（需 `.env`，參考 `.env.example`）
-- 前端開發：`cd crates/frontend; trunk serve`（`/history` 的 3D 檢視器要先 `pnpm --dir viz/eq-3d build`，詳見 [docs/eq-3d.md](9-Project/docs/eq-3d.md)）
+- 前端開發：`cd crates/frontend; trunk serve`（`/history/*` 的 3D 檢視器要先 `pnpm --dir viz/eq-3d build`，詳見 [docs/eq-3d.md](9-Project/docs/eq-3d.md)）
 - 前端建置：`cd crates/frontend; trunk build --release`（輸出 `dist/`）
 - 前端佈署：push `main`（frontend/shared 有變更）→ GitHub Actions `.github/workflows/deploy-frontend.yml` → Cloudflare Pages 專案 `earthquake`（https://earthquake-cm9.pages.dev）。secrets：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`
 - 文件大小檢查：`powershell -ExecutionPolicy Bypass -File scripts/check-docs-size.ps1`（於 repo 根目錄）

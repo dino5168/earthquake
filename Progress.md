@@ -5,7 +5,8 @@
 
 ## 目前狀態
 - 主線：Phase 2 — 資料模型與寫入（Phase 1 已完成並歸檔），**阻塞**中，等使用者回覆 Open Questions
-- 支線（11-10 完成）：CWA 地震目錄 1990–2025 → CSV → 3D 點雲，已上線 https://earthquake-cm9.pages.dev/history
+- 支線（11-10 完成）：CWA 地震目錄 1990–2025 → CSV → 3D 點雲，已上線 https://earthquake-cm9.pages.dev/history/taiwan
+- 支線（11-13 完成）：歷史查詢拆為「台灣」`/history/taiwan` 與「USGS 全球」`/history/usgs`（3D 地球，瀏覽器直接查 USGS API）
 - 支線（11-10 完成）：點雲改用 CWA 震源深度四分類配色，並加上經緯度與深度座標軸；可切換成依規模漸層著色、大小分級（CWA 色帶）；可顯示經緯度與深度格線
 
 ## 下一步
@@ -22,6 +23,12 @@
 - 線上：https://earthquake-cm9.pages.dev（push 前端或 `viz/` 的變更會自動佈署）
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-13 — 歷史查詢加入 USGS 全球（任務：1-Plans/11-歷史資料查詢.md）
+- 計畫書寫在任務單內。USGS 4.5_month 共 657 筆，台灣範圍只有 5 筆 → 做全球 3D 地球；資料由瀏覽器直接查 USGS FDSN API（CORS 開放），不存檔、不動後端（使用者決定）
+- 選單「歷史查詢」改為群組：台灣 `/history/taiwan`、USGS 全球 `/history/usgs`；`/history` 轉址到台灣
+- eq-3d 改為 multi-page，新增 `/viz/eq-3d/usgs/`：查詢面板（UTC 起訖日期、最小規模，預設近 30 天 M ≥ 4.5）、深度倍率、地表透明度、30° 經緯線；點雲 shader／分類／圖例與台灣頁共用
+- `build_terrain.py --region globe` 產生全球 0.25° 高程（約 2 MB）當地球貼圖
+- vitest 56 tests、pytest 8 tests（terrain）、cargo test/clippy、trunk build 都通過；本機瀏覽器驗收：預設查詢 658 筆、2024-01 M ≥ 6 共 12 筆、錯誤日期會立即提示，console 無錯誤
 ### 2026-11-10 — 地震點雲：經緯度與深度格線（任務：1-Plans/10-經緯度格線.md）
 - 新增 `layers/grid.ts`：在海平面（Z=0）畫 1° 經緯線格線；在北牆和東牆畫經緯度垂直線，以及深度 30／70／100／200／300 km 水平線，會跟著深度倍率縮放
 - 控制面板新增「經緯度與深度格線」checkbox，預設顯示（使用者決定）；格線放北牆＋東牆、間距 1°（使用者決定）
@@ -70,9 +77,3 @@
 ### 2026-11-10 — 地震目錄轉點雲（任務：4-資料處理/1-整理資料成點雲.md）
 - `4-資料處理/csv_to_point_cloud.py` + pytest；輸出 `EQHistory.CSV`（73,729 點，依時間排序，已 gitignore）
 - 欄位 `x,y,z,origin_time,magnitude_ml`：x=經度、y=緯度（度）、z=-深度（km）；使用者選經緯度原值（水平/垂直單位不同，3D 檢視需自行縮放 z）
-### 2026-11-10 — CWA 地震目錄 XML → CSV（任務：1-Plans/3-地震資料處理.md）
-- `4-資料處理/cwa_catalog_to_csv.py`（stdlib only）+ pytest 5 tests；1990 輸出 `CSV/CWA-EQ-Catalog-1990.csv`（2451 筆，與 RecordNumber 一致）
-- 欄位 snake_case、單位寫入欄名；選填欄位（erz/rms/erh/最小震央距）缺漏輸出空字串；時間保留原始 `+08:00`
-- 1990–2025 全部轉檔完成（共 73,729 筆）；時間保留 `+08:00`（使用者決定）
-- 原始 XML 與 CSV 輸出加入 `.gitignore`（CSV 可由 XML 重建）
-- 欄位說明書 `4-資料處理/EarthquakeHistory.html`；`review_status` F/N/X 意義待向 CWA 查證

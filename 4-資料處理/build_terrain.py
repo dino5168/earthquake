@@ -4,10 +4,11 @@ Downloads AWS Open Data Terrain Tiles (Terrarium PNG, EPSG:3857), stitches
 them, and resamples onto a regular EPSG:4326 grid.
 
 Output (little-endian Int16, row-major, north row first, metres):
-    9-Project/viz/eq-3d/public/data/terrain.bin + terrain.json
+    9-Project/viz/eq-3d/public/data/<prefix>terrain.bin + <prefix>terrain.json
 
 Usage:
-    uv run --no-project --with numpy --with pillow build_terrain.py
+    uv run --no-project --with numpy --with pillow build_terrain.py                  # Taiwan
+    uv run --no-project --with numpy --with pillow build_terrain.py --region globe   # world
 """
 
 from __future__ import annotations
@@ -29,6 +30,8 @@ from PIL import Image
 HERE = Path(__file__).parent
 TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
 TILE_SIZE = 256
+# Web Mercator (EPSG:3857) is undefined at the poles; tiles stop at this latitude
+MAX_MERC_LAT = 85.0511
 
 
 @dataclass(frozen=True)
@@ -50,6 +53,22 @@ class GridSpec:
     def height(self) -> int:
         """Number of rows (north → south)."""
         return round((self.north - self.south) / self.step) + 1
+
+
+@dataclass(frozen=True)
+class Region:
+    """A grid plus the zoom level and output file prefix used to build it."""
+
+    spec: GridSpec
+    zoom: int
+    prefix: str
+
+
+REGIONS: dict[str, Region] = {
+    "taiwan": Region(GridSpec(), zoom=7, prefix=""),
+    # 0.25° ≈ 28 km at the equator: enough for a globe texture, 1441x721 Int16 ≈ 2 MB
+    "globe": Region(GridSpec(-180.0, 180.0, -90.0, 90.0, 0.25), zoom=3, prefix="globe-"),
+}
 
 
 def lon_to_px(lon: NDArray[np.float64] | float, zoom: int) -> NDArray[np.float64]:
@@ -161,7 +180,10 @@ def build_grid(spec: GridSpec, zoom: int, cache_dir: Path) -> NDArray[np.int16]:
     """
     lons = np.linspace(spec.west, spec.east, spec.width)
     lats = np.linspace(spec.north, spec.south, spec.height)
-    px, py = lon_to_px(lons, zoom), lat_to_px(lats, zoom)
+    # Polar rows repeat the last Mercator row; lon 180 would index one tile past the world edge
+    world_px = TILE_SIZE * 2**zoom
+    px = np.minimum(lon_to_px(lons, zoom), world_px - 1e-6)
+    py = lat_to_px(np.clip(lats, -MAX_MERC_LAT, MAX_MERC_LAT), zoom)
     tx0, tx1 = int(px.min() // TILE_SIZE), int(px.max() // TILE_SIZE)
     ty0, ty1 = int(py.min() // TILE_SIZE), int(py.max() // TILE_SIZE)
 
@@ -175,16 +197,17 @@ def build_grid(spec: GridSpec, zoom: int, cache_dir: Path) -> NDArray[np.int16]:
     return np.round(grid).astype(np.int16)
 
 
-def write_grid(grid: NDArray[np.int16], spec: GridSpec, out_dir: Path) -> None:
-    """Write ``terrain.bin`` and ``terrain.json`` metadata.
+def write_grid(grid: NDArray[np.int16], spec: GridSpec, out_dir: Path, prefix: str = "") -> None:
+    """Write ``<prefix>terrain.bin`` and ``<prefix>terrain.json`` metadata.
 
     Args:
         grid: Elevation grid from :func:`build_grid`.
         spec: Grid specification.
         out_dir: Output directory.
+        prefix: File name prefix, e.g. ``"globe-"``.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "terrain.bin").write_bytes(grid.astype("<i2").tobytes())
+    (out_dir / f"{prefix}terrain.bin").write_bytes(grid.astype("<i2").tobytes())
     meta = {
         **asdict(spec),
         "width": spec.width,
@@ -196,7 +219,7 @@ def write_grid(grid: NDArray[np.int16], spec: GridSpec, out_dir: Path) -> None:
         "max": int(grid.max()),
         "source": "AWS Open Data Terrain Tiles (Terrarium); SRTM, GMTED, ETOPO1 et al.",
     }
-    (out_dir / "terrain.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    (out_dir / f"{prefix}terrain.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -209,7 +232,7 @@ def main(argv: list[str] | None = None) -> int:
         Process exit code.
     """
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--zoom", type=int, default=7)
+    parser.add_argument("--region", choices=sorted(REGIONS), default="taiwan")
     parser.add_argument(
         "--out-dir",
         type=Path,
@@ -218,14 +241,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--cache-dir", type=Path, default=HERE / ".cache" / "terrarium")
     args = parser.parse_args(argv)
 
-    spec = GridSpec()
+    region = REGIONS[args.region]
+    spec = region.spec
     try:
-        grid = build_grid(spec, args.zoom, args.cache_dir)
+        grid = build_grid(spec, region.zoom, args.cache_dir)
     except (urllib.error.URLError, OSError) as e:
         print(f"FAIL: {e}", file=sys.stderr)
         return 1
-    write_grid(grid, spec, args.out_dir)
-    print(f"OK   {args.out_dir / 'terrain.bin'} {spec.width}x{spec.height} "
+    write_grid(grid, spec, args.out_dir, region.prefix)
+    print(f"OK   {args.out_dir / (region.prefix + 'terrain.bin')} {spec.width}x{spec.height} "
           f"elev {grid.min()}..{grid.max()} m")
     return 0
 

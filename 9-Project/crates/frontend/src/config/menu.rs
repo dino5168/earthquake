@@ -40,7 +40,16 @@ impl MenuEntry {
 pub static MENU: &[MenuEntry] = &[
     MenuEntry::link("儀表板", "/", icondata::LuLayoutDashboard),
     MenuEntry::link("即時監測", "/realtime", icondata::LuActivity),
-    MenuEntry::link("歷史查詢", "/history", icondata::LuHistory),
+    MenuEntry {
+        label: "歷史查詢",
+        path: "/history",
+        icon: icondata::LuHistory,
+        badge: false,
+        children: &[
+            MenuEntry::link("台灣", "/history/taiwan", icondata::LuMapPin),
+            MenuEntry::link("USGS 全球", "/history/usgs", icondata::LuGlobe),
+        ],
+    },
     MenuEntry::link("感測器管理", "/sensors", icondata::LuRadioTower),
     MenuEntry::link("告警事件", "/alerts", icondata::LuBellRing).with_badge(),
     MenuEntry::link("報表", "/reports", icondata::LuChartColumn),
@@ -137,6 +146,7 @@ mod tests {
     fn find_title_resolves_entries_and_children() {
         assert_eq!(find_title("/"), Some("儀表板"));
         assert_eq!(find_title("/history/"), Some("歷史查詢"));
+        assert_eq!(find_title("/history/usgs"), Some("USGS 全球"));
         assert_eq!(find_title("/demo/b"), Some("子頁 B"));
         assert_eq!(find_title("/nope"), None);
     }
