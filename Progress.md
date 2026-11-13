@@ -6,7 +6,7 @@
 ## 目前狀態
 - 主線：Phase 2 — 資料模型與寫入（Phase 1 已完成並歸檔），**阻塞**中，等使用者回覆 Open Questions
 - 支線（11-10 完成）：CWA 地震目錄 1990–2025 → CSV → 3D 點雲，已上線 https://earthquake-cm9.pages.dev/history/taiwan
-- 支線（11-13 完成）：歷史查詢拆為「台灣」`/history/taiwan` 與「USGS 全球」`/history/usgs`（3D 地球，瀏覽器直接查 USGS API）
+- 支線（11-13 完成）：歷史查詢拆為「台灣」`/history/taiwan` 與「USGS 全球」`/history/usgs`（3D 地球，瀏覽器直接查 USGS API），已上線 https://earthquake-cm9.pages.dev/history/usgs
 - 支線（11-10 完成）：點雲改用 CWA 震源深度四分類配色，並加上經緯度與深度座標軸；可切換成依規模漸層著色、大小分級（CWA 色帶）；可顯示經緯度與深度格線
 
 ## 下一步
@@ -14,13 +14,16 @@
    - 最關鍵：感測器資料欄位、寫入方式（建議後端 ingest API）
 2. 待確認的小事項：
    - `review_status` F/N/X 的意義（向 CWA 查證）
-3. 滾動式計畫尚未納入 11-10 的支線成果；下次規劃時把 `/history` 3D 和 Phase 3/4 的關係補進去
+   - USGS 頁圖例沿用「點大小 ∝ 規模 ML」，但 USGS 混用 mb／mww 等規模類型，是否改字待使用者決定
+   - 線上 `/history/usgs` 尚未用瀏覽器實際開啟驗收（只確認 HTTP 200；本機已完整驗收）
+3. 滾動式計畫尚未納入 11-10、11-13 的支線成果；下次規劃時把 `/history/*` 3D 和 Phase 3/4 的關係補進去
 
 ## 下次開工
 - 讀本檔 + `1-Plans/2-滾動式計畫.md` 即可接續；任務單在 `2-Tasks/`、`1-Plans/`、`4-資料處理/`
 - 本機前端：先 `cd 9-Project/viz/eq-3d; pnpm build`，再 `cd ../../crates/frontend; trunk serve` → http://127.0.0.1:3000（見 `9-Project/docs/eq-3d.md`）
 - 3D 檢視器單獨開發：`cd 9-Project/viz/eq-3d; pnpm dev` → http://localhost:5173/viz/eq-3d/
 - 線上：https://earthquake-cm9.pages.dev（push 前端或 `viz/` 的變更會自動佈署）
+- USGS 地球單獨開發：`pnpm dev` 後開 http://localhost:5173/viz/eq-3d/usgs/
 
 ## 工作日誌（最新在上，最多 10 筆）
 ### 2026-11-13 — 歷史查詢加入 USGS 全球（任務：1-Plans/11-歷史資料查詢.md）
@@ -29,6 +32,7 @@
 - eq-3d 改為 multi-page，新增 `/viz/eq-3d/usgs/`：查詢面板（UTC 起訖日期、最小規模，預設近 30 天 M ≥ 4.5）、深度倍率、地表透明度、30° 經緯線；點雲 shader／分類／圖例與台灣頁共用
 - `build_terrain.py --region globe` 產生全球 0.25° 高程（約 2 MB）當地球貼圖
 - vitest 56 tests、pytest 8 tests（terrain）、cargo test/clippy、trunk build 都通過；本機瀏覽器驗收：預設查詢 658 筆、2024-01 M ≥ 6 共 12 筆、錯誤日期會立即提示，console 無錯誤
+- commit `af8258d` 佈署成功；`2883072` 把 `5-地震資料/`（USGS 快照，不再需要）加進 `.gitignore`、提交 Obsidian 設定
 ### 2026-11-10 — 地震點雲：經緯度與深度格線（任務：1-Plans/10-經緯度格線.md）
 - 新增 `layers/grid.ts`：在海平面（Z=0）畫 1° 經緯線格線；在北牆和東牆畫經緯度垂直線，以及深度 30／70／100／200／300 km 水平線，會跟著深度倍率縮放
 - 控制面板新增「經緯度與深度格線」checkbox，預設顯示（使用者決定）；格線放北牆＋東牆、間距 1°（使用者決定）
