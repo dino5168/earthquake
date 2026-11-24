@@ -26,6 +26,8 @@
 - USGS 地球單獨開發：`pnpm dev` 後開 http://localhost:5173/viz/eq-3d/usgs/
 
 ## 工作日誌（最新在上，最多 10 筆）
+### 2026-11-24 — 網站標題改為「地震監測網」
+- `index.html` `<title>` 與側欄標題由「十方地震監測網」改為「地震監測網」（後端 doc comment 與 repo 名稱不變）
 ### 2026-11-13 — 歷史查詢加入 USGS 全球（任務：1-Plans/11-歷史資料查詢.md）
 - 計畫書寫在任務單內。USGS 4.5_month 共 657 筆，台灣範圍只有 5 筆 → 做全球 3D 地球；資料由瀏覽器直接查 USGS FDSN API（CORS 開放），不存檔、不動後端（使用者決定）
 - 選單「歷史查詢」改為群組：台灣 `/history/taiwan`、USGS 全球 `/history/usgs`；`/history` 轉址到台灣
@@ -78,6 +80,3 @@
 - 計畫書 `1-Plans/4-地震點雲3D實作計畫.md`：three.js 點雲 + DEM 地形面，T1–T7；評估結論可行
 - 實測：AWS Terrain Tiles 可下載，含海底地形（−6370～3545 m）；73,729 點單一 draw call
 - 決策：`4-資料處理/eq-3d/` 獨立原型（Vite + TS）、不做時間動畫、地形用 AWS Terrain Tiles；待開工 T1
-### 2026-11-10 — 地震目錄轉點雲（任務：4-資料處理/1-整理資料成點雲.md）
-- `4-資料處理/csv_to_point_cloud.py` + pytest；輸出 `EQHistory.CSV`（73,729 點，依時間排序，已 gitignore）
-- 欄位 `x,y,z,origin_time,magnitude_ml`：x=經度、y=緯度（度）、z=-深度（km）；使用者選經緯度原值（水平/垂直單位不同，3D 檢視需自行縮放 z）

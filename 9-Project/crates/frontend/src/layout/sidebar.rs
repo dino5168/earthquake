@@ -25,7 +25,7 @@ pub fn Sidebar() -> impl IntoView {
                 <span class="sidebar__logo">
                     <Icon icon=icondata::LuActivity />
                 </span>
-                <span class="sidebar__title">"十方地震監測網"</span>
+                <span class="sidebar__title">"地震監測網"</span>
             </div>
             <nav class="sidebar__nav" aria-label="主選單">
                 {entries}
